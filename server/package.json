@@ -2,13 +2,29 @@
   "name": "clinictrack-server",
   "version": "0.1.0",
   "private": true,
-  "description": "ClinicTrack REST API (Express + MongoDB). Built out in Phase 2.",
+  "description": "ClinicTrack REST API (Express + MongoDB)",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "echo \"server scripts arrive in Phase 2\" && exit 0",
-    "seed": "echo \"seed script arrives in Phase 2\" && exit 0"
+    "dev": "nodemon index.js",
+    "seed": "node seed/seed.js",
+    "test": "node scripts/smoke.js"
   },
-  "dependencies": {},
-  "devDependencies": {}
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-async-errors": "^3.1.1",
+    "express-rate-limit": "^7.4.0",
+    "express-validator": "^7.2.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.6.0",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "mongodb-memory-server": "^10.0.0",
+    "nodemon": "^3.1.4"
+  }
 }

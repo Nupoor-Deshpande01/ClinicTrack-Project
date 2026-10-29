@@ -1,0 +1,235 @@
+/**
+ * seed.js — dummy data for the ClinicTrack demo (all data is invented).
+ *
+ * Creates:
+ *  - 4 users: 1 admin, 2 doctors, 1 reception
+ *  - 30 patients with Indian names, MRNs, DOBs, phones and a few allergies
+ *  - 1-3 visits per patient; one visit is revised (v2) for 6 of them and
+ *    rolled into a v3 for 2, so the timeline/diff views have material.
+ *
+ * Run:  npm run seed   (or)  node seed/seed.js   (reads server/.env)
+ */
+require('dotenv').config();
+const mongoose = require('mongoose');
+const User = require('../models/user.model');
+const Patient = require('../models/patient.model');
+const Visit = require('../models/visit.model');
+const AuditLog = require('../models/auditLog.model');
+
+const FIRST = [
+  'Aarav',
+  'Vivaan',
+  'Aditya',
+  'Siddharth',
+  'Rohit',
+  'Kabir',
+  'Rahul',
+  'Nikhil',
+  'Arjun',
+  'Rajesh',
+  'Aarohi',
+  'Saanvi',
+  'Diya',
+  'Ananya',
+  'Ishita',
+  'Meera',
+  'Kavya',
+  'Priya',
+  'Rhea',
+  'Sneha',
+];
+const LAST = [
+  'Deshmukh',
+  'Kulkarni',
+  'Pawar',
+  'Patil',
+  'Jadhav',
+  'Shinde',
+  'Joshi',
+  'Bhosale',
+  'Ghule',
+  'Nikam',
+];
+const DIAGNOSES = [
+  { diagnosis: 'Acute viral fever', symptoms: ['fever', 'body ache'], meds: ['paracetamol'] },
+  { diagnosis: 'Hypertension (stage 1)', symptoms: ['headache'], meds: ['amlodipine'] },
+  { diagnosis: 'Allergic rhinitis', symptoms: ['sneezing', 'itchy eyes'], meds: ['cetirizine'] },
+  {
+    diagnosis: 'Iron-deficiency anaemia',
+    symptoms: ['fatigue', 'pallor'],
+    meds: ['ferrous sulfate'],
+  },
+  { diagnosis: 'Type 2 diabetes - newly detected', symptoms: ['polyuria'], meds: ['metformin'] },
+];
+const NOTES_SNIPPET =
+  'General condition stable. Advised hydration and rest. Discussed medication schedule.';
+
+function patientAt(i) {
+  const first = FIRST[i % FIRST.length];
+  const last = LAST[i % LAST.length];
+  const age = 25 + ((i * 7) % 45); // ages 25-69, spread deterministically
+  const dob = new Date(new Date().getFullYear() - age, (i * 5) % 12, ((i * 9) % 27) + 1);
+  const g = i % 3 === 0 ? 'other' : i % 2 === 0 ? 'female' : 'male';
+  return {
+    // MRN assigned HERE (not by the pre-save hook) so the 30-doc bulk insert
+    // never races: batch hooks all read the same count before any insert lands.
+    mrn: `MC-${String(i + 1).padStart(5, '0')}`,
+    fullName: `${first} ${last}`,
+    phone: `9${String(800000000 + i * 1234567).slice(0, 9)}`, // always starts with 9 → 6-9 digits ok
+    dob,
+    gender: g,
+    bloodGroup: ['A+', 'B+', 'O+', 'AB+'][i % 4],
+    address: `Plot ${10 + i}, Nigdi, Pimpri-Chinchwad, Pune ${411000 + (i % 60)}`,
+    allergies: i % 5 === 0 ? ['penicillin'] : i % 7 === 0 ? ['sulfonamides', 'latex'] : [],
+  };
+}
+
+/**
+ * @param {object} opts { uri?, drop=true } — URI comes from MONGO_URI by default
+ */
+async function runSeed(opts = {}) {
+  const uri = opts.uri || process.env.MONGO_URI;
+  if (!mongoose.connection.readyState) {
+    await mongoose.connect(uri, opts.memory ? {} : { serverSelectionTimeoutMS: 10000 });
+    opts.standalone = opts.standalone ?? true;
+  }
+
+  // Wipe demo collections (dummy data project — nothing real is lost).
+  await Promise.all([
+    User.deleteMany({}),
+    Patient.deleteMany({}),
+    Visit.deleteMany({}),
+    AuditLog.deleteMany({}),
+  ]);
+
+  const users = await User.create([
+    {
+      name: 'Anjali Deshmukh',
+      email: 'doctor@clinic.test',
+      password: 'Doctor@123',
+      role: 'doctor',
+      specialty: 'Cardiology',
+      phone: '9822099881',
+    },
+    {
+      name: 'Rohan Jadhav',
+      email: 'doctor2@clinic.test',
+      password: 'Doctor@123',
+      role: 'doctor',
+      specialty: 'Paediatrics',
+      phone: '9822099882',
+    },
+    {
+      name: 'Sneha Patil',
+      email: 'staff@clinic.test',
+      password: 'Staff@123',
+      role: 'staff',
+      phone: '9822099883',
+    },
+    { name: 'System Admin', email: 'admin@clinic.test', password: 'Admin@123', role: 'admin' },
+  ]);
+  const [doc1, doc2] = users.filter(u => u.role === 'doctor');
+
+  // ---- patients ----
+  const patientDocs = await Patient.create(
+    Array.from({ length: 30 }, (_, i) => ({
+      ...patientAt(i),
+      primaryDoctorId: i % 2 ? doc1._id : doc2._id,
+      createdBy: users[3]._id,
+    }))
+  );
+
+  // ---- visits (deterministic spread over the last ~60 days) ----
+  const visitsMade = [];
+  for (const [i, patient] of patientDocs.entries()) {
+    const nVisits = 1 + (i % 3); // 1-3 visits
+    for (let k = 0; k < nVisits; k++) {
+      const daysAgo = 60 - k * 15 - (i % 7);
+      const btn = DIAGNOSES[(i + k) % DIAGNOSES.length];
+      const v = await Visit.create({
+        patientId: patient._id,
+        doctorId: patient.primaryDoctorId,
+        visitDate: new Date(Date.now() - daysAgo * 24 * 3600 * 1000),
+        diagnosis: btn.diagnosis,
+        symptoms: btn.symptoms,
+        notes: NOTES_SNIPPET,
+        vitals: {
+          temperatureC: 36.5 + 0.5 * (k + 1) > 37.5 ? 37.1 : 36.8,
+          bloodPressure: `${112 + ((i * 3) % 20)}/${74 + (i % 12)}`,
+          heartRate: 70 + (i % 25),
+        },
+        createdBy: patient.primaryDoctorId,
+      });
+      v.familyId = v._id;
+      await v.save();
+      visitsMade.push(v);
+    }
+  }
+
+  // ---- revision history for the demo (v2 for 6 visits, v3 for 2) ----
+  async function makeNextVersion(from, patch, reason) {
+    const maxNumber = Math.max(
+      ...visitsMade
+        .filter(x => String(x.familyId) === String(from.familyId))
+        .map(x => x.versionNumber)
+    );
+    const next = await Visit.create({
+      ...from.toObject(),
+      ...patch,
+      _id: undefined,
+      versionNumber: maxNumber + 1,
+      parentVisitId: from._id,
+      changeReason: reason,
+      isCurrent: true,
+      createdAt: undefined,
+      updatedAt: undefined,
+    });
+    next.familyId = from.familyId;
+    await next.save();
+    from.isCurrent = false;
+    await from.save();
+    visitsMade.push(next);
+    return next;
+  }
+
+  for (let i = 0; i < 6; i++) {
+    const base = visitsMade[i * 3]; // spread across patients
+    await makeNextVersion(
+      base,
+      { diagnosis: `${base.diagnosis} (revised after lab report)` },
+      'Revised after lab report'
+    );
+  }
+  for (let i = 0; i < 2; i++) {
+    const revised = visitsMade.filter(v => v.versionNumber === 2)[i];
+    await makeNextVersion(
+      revised,
+      { notes: 'Patient responding well; continue current course, review in 2 weeks.' },
+      'Reassured after follow-up'
+    );
+  }
+
+  const summary = { users: users.length, patients: patientDocs.length, visits: visitsMade.length };
+  console.log('Seed complete:', JSON.stringify(summary));
+
+  if (opts.standalone) await mongoose.disconnect();
+  return summary;
+}
+
+// ---- CLI entry: `node seed/seed.js` ----
+if (require.main === module) {
+  runSeed()
+    .then(summary => {
+      console.log('\nDemo logins (password shown once, seeded in plain by you, stored hashed):');
+      console.log('  doctor : doctor@clinic.test  / Doctor@123');
+      console.log('  staff  : staff@clinic.test   / Staff@123');
+      console.log('  admin  : admin@clinic.test   / Admin@123');
+      console.log(summary);
+    })
+    .catch(err => {
+      console.error('Seed failed:', err.message);
+      process.exit(1);
+    });
+}
+
+module.exports = { runSeed };

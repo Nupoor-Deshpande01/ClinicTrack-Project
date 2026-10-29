@@ -1,0 +1,14 @@
+{
+  "name": "clinictrack-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ClinicTrack REST API (Express + MongoDB). Built out in Phase 2.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "echo \"server scripts arrive in Phase 2\" && exit 0",
+    "seed": "echo \"seed script arrives in Phase 2\" && exit 0"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

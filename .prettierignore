@@ -1,0 +1,6 @@
+node_modules/
+client/dist/
+server/exports/
+server/backups/
+*.log
+package-lock.json

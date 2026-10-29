@@ -74,10 +74,10 @@ npm run format:check
 
 ## Screenshot checklist _(to fill in as phases complete)_
 
-- [ ] Public landing page (hero, services, doctors, footer)
-- [ ] Appointment form with inline validation errors
-- [ ] Chat window widget
-- [ ] Tools page (BMI, paeds dose, slot picker)
+- [x] Public landing page (hero, services, doctors, footer)
+- [x] Appointment form with inline validation errors
+- [x] Chat window widget
+- [x] Tools page (BMI, paeds dose, slot picker)
 - [ ] Login screen
 - [ ] Dashboard (stat cards, arrival chart, specialists, appointments)
 - [ ] Patient list with search/filter/pagination
@@ -93,7 +93,7 @@ npm run format:check
 ## Modules in progress
 
 - **Phase 0 (done):** monorepo scaffold, git, linting, env files, README skeleton.
-- **Phase 1:** public-site (landing, appointment form, chat widget, tools, Tomcat guide).
+- **Phase 1 (done):** public-site (landing, appointment form, chat widget, tools, Tomcat guide).
 - **Phase 2:** backend foundation (models, auth, patients, versioned visits, seed).
 - **Phase 3:** React app (theme, layout, auth, dashboard, patients, visits, diff, prescriptions).
 - **Phase 4:** wow features (audit chain, allergy alerts, PDF+QR, live queue, analytics).

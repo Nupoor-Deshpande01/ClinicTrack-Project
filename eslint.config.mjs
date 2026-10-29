@@ -34,6 +34,17 @@ export default [
     },
   },
   {
+    files: ['public-site/**/*.js'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'script',
+      globals: { ...globals.browser },
+    },
+    rules: {
+      eqeqeq: ['error', 'smart'],
+    },
+  },
+  {
     files: ['client/src/**/*.{js,jsx}'],
     languageOptions: {
       ecmaVersion: 2022,

@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Patient Tools — Siddhivinayak Clinic</title>
+    <meta
+      name="description"
+      content="BMI calculator, paediatric dose calculator and appointment slot finder from Siddhivinayak Clinic."
+    />
+
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/site.css" />
+  </head>
+  <body>
+    <!-- Smaller navbar shared with the landing page -->
+    <nav class="navbar navbar-expand-lg sticky-top ct-navbar">
+      <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="index.html">
+          <span class="ct-logo"><i class="bi bi-heart-pulse-fill" aria-hidden="true"></i></span>
+          <span class="fw-bold">Siddhivinayak Clinic</span>
+        </a>
+        <div class="d-flex align-items-center gap-2">
+          <button type="button" class="btn btn-sm btn-ct-outline ct-btn" data-theme-toggle>
+            <i class="bi bi-sun-fill ct-theme-icon" aria-hidden="true"></i>
+            <span class="ct-theme-label d-none d-lg-inline">Light</span>
+          </button>
+          <a href="index.html" class="btn btn-ct-primary ct-btn">Home</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="py-5">
+      <div class="container">
+        <span class="ct-label">Patient Tools</span>
+        <h1 class="ct-section-title mt-2">Quick Health Tools</h1>
+        <p class="ct-text-muted col-lg-8">
+          Three tiny utilities built with plain HTML, CSS and JavaScript — every input is validated
+          first, and precise inline error messages are shown.
+        </p>
+
+        <div class="row g-4 mt-2">
+          <!-- ================= 1. BMI ================= -->
+          <div class="col-lg-4">
+            <div class="ct-card h-100 p-4">
+              <span class="ct-service-icon mb-3"
+                ><i class="bi bi-speedometer" aria-hidden="true"></i
+              ></span>
+              <h2 class="h5 fw-bold">BMI Calculator</h2>
+              <p class="small ct-text-muted">Body Mass Index = weight (kg) / height (m)².</p>
+              <form id="bmi-form" novalidate>
+                <label for="bmi-weight" class="form-label fw-semibold small"
+                  >Weight (kg) <span class="text-danger">*</span></label
+                >
+                <input
+                  type="number"
+                  id="bmi-weight"
+                  class="form-control"
+                  placeholder="e.g. 62"
+                  step="0.1"
+                  min="1"
+                  max="400"
+                  required
+                />
+                <span id="bmi-weight-error" class="ct-error" hidden></span>
+
+                <label for="bmi-height" class="form-label fw-semibold small mt-2"
+                  >Height (cm) <span class="text-danger">*</span></label
+                >
+                <input
+                  type="number"
+                  id="bmi-height"
+                  class="form-control"
+                  placeholder="e.g. 165"
+                  step="0.1"
+                  min="50"
+                  max="250"
+                  required
+                />
+                <span id="bmi-height-error" class="ct-error" hidden></span>
+
+                <button type="submit" id="bmi-submit" class="btn btn-ct-primary ct-btn mt-3 w-100">
+                  Calculate BMI
+                </button>
+              </form>
+              <div id="bmi-result" class="mt-3 d-none" aria-live="polite"></div>
+              <p class="small ct-text-muted mt-3 mb-0">
+                <i class="bi bi-info-circle me-1" aria-hidden="true"></i> Categories: Underweight
+                &lt; 18.5 · Normal 18.5–24.9 · Overweight 25–29.9 · Obese ≥ 30.
+              </p>
+            </div>
+          </div>
+
+          <!-- ================= 2. Paediatric dose ================= -->
+          <div class="col-lg-4">
+            <div class="ct-card h-100 p-4">
+              <span class="ct-service-icon mb-3"
+                ><i class="bi bi-capsule" aria-hidden="true"></i
+              ></span>
+              <h2 class="h5 fw-bold">Paediatric Dose Calculator</h2>
+              <p class="small ct-text-muted">
+                Weight-based dose: weight (kg) × mg/kg/day ÷ doses per day.
+              </p>
+              <form id="dose-form" novalidate>
+                <label for="dose-weight" class="form-label fw-semibold small"
+                  >Child's weight (kg) <span class="text-danger">*</span></label
+                >
+                <input
+                  type="number"
+                  id="dose-weight"
+                  class="form-control"
+                  placeholder="e.g. 12"
+                  step="0.1"
+                  min="0.5"
+                  max="90"
+                  required
+                />
+                <span id="dose-weight-error" class="ct-error" hidden></span>
+
+                <label for="dose-mgkg" class="form-label fw-semibold small mt-2"
+                  >Dose (mg/kg/day) <span class="text-danger">*</span></label
+                >
+                <input
+                  type="number"
+                  id="dose-mgkg"
+                  class="form-control"
+                  placeholder="e.g. 15"
+                  step="0.1"
+                  min="0.1"
+                  max="500"
+                  required
+                />
+                <span id="dose-mgkg-error" class="ct-error" hidden></span>
+
+                <label for="dose-frequency" class="form-label fw-semibold small mt-2"
+                  >Doses per day</label
+                >
+                <select id="dose-frequency" class="form-select">
+                  <option value="1">Once daily</option>
+                  <option value="2">Twice daily</option>
+                  <option value="3" selected>Three times daily</option>
+                  <option value="4">Four times daily</option>
+                </select>
+
+                <button type="submit" id="dose-submit" class="btn btn-ct-primary ct-btn mt-3 w-100">
+                  Calculate Dose
+                </button>
+              </form>
+              <div id="dose-result" class="mt-3" aria-live="polite"></div>
+              <div id="dose-disclaimer" class="small ct-error mb-0 d-none" role="alert">
+                <strong>Safety notice:</strong> this is a learning demo — never compute a child's
+                dose from this page. Always confirm with the treating doctor or pharmacist.
+              </div>
+            </div>
+          </div>
+
+          <!-- ================= 3. Slot picker ================= -->
+          <div class="col-lg-4">
+            <div class="ct-card h-100 p-4">
+              <span class="ct-service-icon mb-3"
+                ><i class="bi bi-calendar-check" aria-hidden="true"></i
+              ></span>
+              <h2 class="h5 fw-bold">Appointment Slot Picker</h2>
+              <p class="small ct-text-muted">
+                Pick a date and session; taken slots are struck through and disabled.
+              </p>
+              <form id="slot-form" novalidate>
+                <div class="row g-2">
+                  <div class="col-7">
+                    <label for="slot-date" class="form-label fw-semibold small"
+                      >Date <span class="text-danger">*</span></label
+                    >
+                    <input type="date" id="slot-date" class="form-control" required />
+                    <span id="slot-date-error" class="ct-error" hidden></span>
+                  </div>
+                  <div class="col-5">
+                    <label for="slot-session" class="form-label fw-semibold small">Session</label>
+                    <select id="slot-session" class="form-select">
+                      <option value="morning">Morning</option>
+                      <option value="evening">Evening</option>
+                    </select>
+                  </div>
+                  <div class="col-12">
+                    <label for="slot-doctor" class="form-label fw-semibold small">Doctor</label>
+                    <select id="slot-doctor" class="form-select"></select>
+                  </div>
+                </div>
+                <button
+                  type="submit"
+                  id="slot-refresh"
+                  class="btn btn-ct-outline ct-btn mt-3 w-100"
+                >
+                  Show available slots
+                </button>
+              </form>
+              <p class="small fw-semibold mt-3 mb-1">Available times:</p>
+              <div id="slot-grid" aria-live="polite"></div>
+              <p
+                class="small ct-badge ct-badge-success mt-1 mb-0"
+                id="slot-picked"
+                role="status"
+              ></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-warning mt-4 small" role="note">
+          <i class="bi bi-shield-exclamation me-1" aria-hidden="true"></i>
+          All tools on this page use <strong>dummy data</strong> and are for course demonstration
+          (Web Technology, 2310362L) only — not for real medical decisions.
+        </div>
+      </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/clinic-utils.js"></script>
+    <script src="js/site-theme.js"></script>
+    <script src="js/tools.js"></script>
+  </body>
+</html>

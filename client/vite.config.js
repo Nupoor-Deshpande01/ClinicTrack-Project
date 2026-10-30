@@ -15,6 +15,8 @@ export default defineConfig({
     fs: { allow: ['..'] },
     proxy: {
       '/api': { target: 'http://localhost:5000', changeOrigin: true },
+      // The Bootstrap marketing site is served by Express under /site.
+      '/site': { target: 'http://localhost:5000', changeOrigin: true },
       // ws: true lets the live queue work through the dev proxy.
       '/socket.io': { target: 'http://localhost:5000', changeOrigin: true, ws: true },
     },
@@ -37,6 +39,7 @@ export default defineConfig({
     port: 4173,
     proxy: {
       '/api': { target: 'http://localhost:5000', changeOrigin: true },
+      '/site': { target: 'http://localhost:5000', changeOrigin: true },
       '/socket.io': { target: 'http://localhost:5000', changeOrigin: true, ws: true },
     },
   },

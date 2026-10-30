@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { HeartPulse, LogIn } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -131,7 +131,10 @@ export default function Login() {
           </div>
 
           <p className="ct-help mt-4 mb-0">
-            <Link to="/">← Back to the clinic website</Link>
+            {/* Plain <a>: the marketing site is static HTML outside the React router. */}
+            <a href={import.meta.env.VITE_PUBLIC_SITE_URL || '/site/'}>
+              ← Back to the clinic website
+            </a>
           </p>
         </div>
       </div>

@@ -73,6 +73,19 @@ cd client && npm run dev          # in a second terminal
 
 `dev:memory` is a demo helper only — data disappears when the process stops.
 
+### Where each part lives in the browser
+
+| URL                                     | What it is                                       |
+| --------------------------------------- | ------------------------------------------------ |
+| `http://localhost:5173`                 | The React clinic app (login → dashboard)         |
+| `http://localhost:5173/site/`           | The Bootstrap marketing site from `public-site/` |
+| `http://localhost:5173/site/tools.html` | BMI, paediatric dose and slot-picker tools       |
+| `http://localhost:5000/api/health`      | API health (uptime, memory, DB state)            |
+
+`/site/` is `express.static` for `public-site/`, so no second server is needed while
+developing. For the course submission the marketing site is still deployed to Tomcat on
+its own — see [docs/TOMCAT_SETUP.md](docs/TOMCAT_SETUP.md) — or opened directly as a file.
+
 ### Wow-feature screens
 
 | URL                | What it shows                                               |

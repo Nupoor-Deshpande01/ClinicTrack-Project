@@ -12,6 +12,7 @@ require('dotenv').config(); // loads server/.env when run from this folder
 // no error param). Must be required BEFORE any route modules.
 require('express-async-errors');
 
+const path = require('path'); // core module: locates the static marketing site
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
@@ -34,6 +35,13 @@ const { isDBConnected } = require('./config/db');
 
 function createApp() {
   const app = express();
+
+  // ---- public marketing website (public-site/) ----
+  // Served before helmet/JSON parsing so its CDN assets and inline handlers keep
+  // working unchanged, and so the same URL (/site/) works in development and on
+  // Render. For the course submission the canonical host is still Tomcat — see
+  // docs/TOMCAT_SETUP.md.
+  app.use('/site', express.static(path.join(__dirname, '..', 'public-site')));
 
   // ---- security + logging middleware ----
   app.use(helmet());

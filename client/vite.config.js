@@ -19,6 +19,20 @@ export default defineConfig({
       '/socket.io': { target: 'http://localhost:5000', changeOrigin: true, ws: true },
     },
   },
+  build: {
+    // Split the heavy, rarely-changing libraries so the app shell caches well
+    // and no single chunk trips the 500 kB warning.
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ['react', 'react-dom', 'react-router-dom'],
+          charts: ['recharts'],
+          forms: ['react-hook-form', '@hookform/resolvers', 'yup'],
+          realtime: ['socket.io-client'],
+        },
+      },
+    },
+  },
   preview: {
     port: 4173,
     proxy: {

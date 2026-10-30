@@ -1,0 +1,558 @@
+{
+  "info": {
+    "_postman_id": "b7f1a0c2-5d1e-4a77-9a4e-clinictrack01",
+    "name": "ClinicTrack API",
+    "description": "ClinicTrack REST API (Siddhivinayak Clinic). Run **Auth → Login** first: the test script saves the JWT into the `token` collection variable and every other request inherits it.\n\nVariables: `baseUrl` (default http://localhost:5000/api), `token`, `patientId`, `visitId`, `versionId`, `prescriptionId`, `qrToken`, `queueTokenId`.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api" },
+    { "key": "token", "value": "" },
+    { "key": "patientId", "value": "" },
+    { "key": "visitId", "value": "" },
+    { "key": "versionId", "value": "" },
+    { "key": "prescriptionId", "value": "" },
+    { "key": "qrToken", "value": "" },
+    { "key": "queueTokenId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health check",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/health", "host": ["{{baseUrl}}"], "path": ["health"] },
+            "description": "Node `os` module: uptime, memory, load and DB state."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login (saves token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('200 and a token', () => {",
+                  "  pm.response.to.have.status(200);",
+                  "  pm.expect(pm.response.json().token).to.be.a('string');",
+                  "});",
+                  "if (pm.response.code === 200) {",
+                  "  pm.collectionVariables.set('token', pm.response.json().token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"doctor@clinic.test\",\n  \"password\": \"Doctor@123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Demo accounts: doctor@clinic.test / Doctor@123, staff@clinic.test / Staff@123, admin@clinic.test / Admin@123."
+          }
+        },
+        {
+          "name": "Current user",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/auth/me", "host": ["{{baseUrl}}"], "path": ["auth", "me"] }
+          }
+        },
+        {
+          "name": "Login — invalid payload (422)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"not-an-email\",\n  \"password\": \"123\"\n}" },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Server-side validation is independent of the React form: this returns 422 with per-field errors."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Patients",
+      "item": [
+        {
+          "name": "List patients",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/patients?search=&gender=&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients"],
+              "query": [
+                { "key": "search", "value": "" },
+                { "key": "gender", "value": "" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            },
+            "description": "Reception receives the same rows without `allergies`."
+          }
+        },
+        {
+          "name": "Get patient",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}"]
+            }
+          }
+        },
+        {
+          "name": "Register patient",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  pm.collectionVariables.set('patientId', pm.response.json().data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Postman Patil\",\n  \"phone\": \"9876500011\",\n  \"dob\": \"1991-04-18\",\n  \"gender\": \"male\",\n  \"bloodGroup\": \"B+\",\n  \"allergies\": [],\n  \"address\": \"Nigdi, Pune\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/patients", "host": ["{{baseUrl}}"], "path": ["patients"] },
+            "description": "A duplicate mobile number returns 201 plus a `warnings` array."
+          }
+        },
+        {
+          "name": "Update patient",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Postman Patil\",\n  \"phone\": \"9876500011\",\n  \"dob\": \"1991-04-18\",\n  \"gender\": \"male\",\n  \"allergies\": [\"penicillin\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}"]
+            },
+            "description": "Doctor/admin only: reception gets 403 when it touches allergies."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Visits (versioned)",
+      "item": [
+        {
+          "name": "Create visit v1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const d = pm.response.json().data;",
+                  "  pm.collectionVariables.set('visitId', d.id);",
+                  "  pm.collectionVariables.set('versionId', d.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"visitDate\": \"2026-10-30\",\n  \"diagnosis\": \"Acute viral fever\",\n  \"symptoms\": [\"fever\", \"body ache\"],\n  \"notes\": \"Stable. Advised hydration.\",\n  \"vitals\": { \"temperatureC\": 38.1, \"bloodPressure\": \"118/76\", \"heartRate\": 92 }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/visits",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "visits"]
+            }
+          }
+        },
+        {
+          "name": "List patient's current visits",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/patients/{{patientId}}/visits",
+              "host": ["{{baseUrl}}"],
+              "path": ["patients", "{{patientId}}", "visits"]
+            }
+          }
+        },
+        {
+          "name": "Edit visit → new version",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"diagnosis\": \"Acute viral fever (revised after lab report)\",\n  \"changeReason\": \"Lab report received\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/visits/{{versionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["visits", "{{versionId}}"]
+            },
+            "description": "Never mutates: inserts v2 with parentVisitId + changeReason and flips isCurrent."
+          }
+        },
+        {
+          "name": "Version timeline",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/visits/{{visitId}}/versions",
+              "host": ["{{baseUrl}}"],
+              "path": ["visits", "{{visitId}}", "versions"]
+            }
+          }
+        },
+        {
+          "name": "Diff two versions",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/visits/{{visitId}}/diff/{{versionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["visits", "{{visitId}}", "diff", "{{versionId}}"]
+            },
+            "description": "Replace the second id with the other version to compare v1 vs v2."
+          }
+        },
+        {
+          "name": "Rollback to an older version",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"targetVisitId\": \"{{visitId}}\"\n}" },
+            "url": {
+              "raw": "{{baseUrl}}/visits/{{versionId}}/rollback",
+              "host": ["{{baseUrl}}"],
+              "path": ["visits", "{{versionId}}", "rollback"]
+            },
+            "description": "Copies the target forward as a new version; 409 unless :id is the current version."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Prescriptions",
+      "item": [
+        {
+          "name": "Create prescription",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const d = pm.response.json().data;",
+                  "  pm.collectionVariables.set('prescriptionId', d.id || d._id);",
+                  "  pm.collectionVariables.set('qrToken', d.qrToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"medicines\": [\n    { \"name\": \"Paracetamol\", \"dosage\": \"500 mg\", \"frequency\": \"1-0-1\", \"durationDays\": 3 },\n    { \"name\": \"Cetirizine\", \"dosage\": \"10 mg\", \"frequency\": \"0-0-1\", \"durationDays\": 5 }\n  ],\n  \"advice\": \"Plenty of fluids and rest.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/visits/{{versionId}}/prescription",
+              "host": ["{{baseUrl}}"],
+              "path": ["visits", "{{versionId}}", "prescription"]
+            },
+            "description": "Dosage must look like `500 mg`; otherwise 422."
+          }
+        },
+        {
+          "name": "Recent prescriptions",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/prescriptions?limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["prescriptions"],
+              "query": [{ "key": "limit", "value": "20" }]
+            }
+          }
+        },
+        {
+          "name": "Prescription PDF",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/prescriptions/{{prescriptionId}}/pdf",
+              "host": ["{{baseUrl}}"],
+              "path": ["prescriptions", "{{prescriptionId}}", "pdf"]
+            },
+            "description": "Streams an A5 PDF with letterhead and QR. In Postman choose \"Send and Download\"."
+          }
+        },
+        {
+          "name": "Verify by QR token (public)",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/prescriptions/verify/{{qrToken}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["prescriptions", "verify", "{{qrToken}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Appointments",
+      "item": [
+        {
+          "name": "Book appointment",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{patientId}}\",\n  \"doctorId\": \"REPLACE_WITH_DOCTOR_ID\",\n  \"scheduledAt\": \"2026-11-02T10:30:00.000Z\",\n  \"disease\": \"Follow-up\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/appointments",
+              "host": ["{{baseUrl}}"],
+              "path": ["appointments"]
+            },
+            "description": "Get a doctor id from GET /users?role=doctor."
+          }
+        },
+        {
+          "name": "Appointments for a day",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/appointments?date=2026-11-02",
+              "host": ["{{baseUrl}}"],
+              "path": ["appointments"],
+              "query": [{ "key": "date", "value": "2026-11-02" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Live queue",
+      "item": [
+        {
+          "name": "Today's queue",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/queue", "host": ["{{baseUrl}}"], "path": ["queue"] }
+          }
+        },
+        {
+          "name": "Issue token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const d = pm.response.json();",
+                  "if (pm.response.code === 201) {",
+                  "  pm.collectionVariables.set('queueTokenId', d.data[d.data.length - 1].id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"patientId\": \"{{patientId}}\",\n  \"note\": \"Walk-in\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/queue", "host": ["{{baseUrl}}"], "path": ["queue"] }
+          }
+        },
+        {
+          "name": "Call token (serving)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"serving\"\n}" },
+            "url": {
+              "raw": "{{baseUrl}}/queue/{{queueTokenId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["queue", "{{queueTokenId}}"]
+            },
+            "description": "Broadcasts `queue:update` to every connected Now Serving board."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Audit",
+      "item": [
+        {
+          "name": "Audit entries",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/audit?page=1&limit=25",
+              "host": ["{{baseUrl}}"],
+              "path": ["audit"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "25" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Verify integrity",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('chain reported', () => {",
+                  "  const d = pm.response.json().data;",
+                  "  pm.expect(d).to.have.property('valid');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/audit/verify",
+              "host": ["{{baseUrl}}"],
+              "path": ["audit", "verify"]
+            },
+            "description": "Recomputes the SHA-256 chain. Tampering any historical entry breaks it at that position."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "Summary",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/analytics/summary?months=6",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "summary"],
+              "query": [{ "key": "months", "value": "6" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Doctors",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/users?role=doctor",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"],
+              "query": [{ "key": "role", "value": "doctor" }]
+            }
+          }
+        },
+        {
+          "name": "Create staff account (admin)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"New Receptionist\",\n  \"email\": \"reception2@clinic.test\",\n  \"password\": \"Staff@123\",\n  \"role\": \"staff\",\n  \"phone\": \"9876500022\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/users", "host": ["{{baseUrl}}"], "path": ["users"] },
+            "description": "Log in as admin@clinic.test first — a doctor account gets 403."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Export",
+      "item": [
+        {
+          "name": "JSON backup (admin)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/export/backup",
+              "host": ["{{baseUrl}}"],
+              "path": ["export", "backup"]
+            },
+            "description": "Streamed attachment; log in as admin. Use \"Send and Download\"."
+          }
+        },
+        {
+          "name": "Patients CSV (admin)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/export/patients.csv",
+              "host": ["{{baseUrl}}"],
+              "path": ["export", "patients.csv"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

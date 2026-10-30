@@ -99,10 +99,14 @@ export default function Sidebar({ open, onClose }) {
               <span>Users</span>
             </NavLink>
           )}
-          <span className="ct-nav-item is-disabled" aria-disabled="true" title="Arrives in Phase 5">
+          <span
+            className="ct-nav-item is-disabled"
+            aria-disabled="true"
+            title="Settings is outside the scope of this demo build"
+          >
             <Settings size={18} aria-hidden="true" />
             <span>Settings</span>
-            <em className="ct-soon">Soon</em>
+            <em className="ct-soon">Demo</em>
           </span>
         </nav>
 

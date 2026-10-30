@@ -2,11 +2,11 @@
 
 Three pieces, three hosts:
 
-| Piece    | Host            | What it runs                            |
-| -------- | --------------- | --------------------------------------- |
-| `client` | Vercel          | Static Vite build (SPA)                 |
-| `server` | Render          | Express API + Socket.IO (Node web service) |
-| Database | MongoDB Atlas   | The only database                       |
+| Piece         | Host          | What it runs                                       |
+| ------------- | ------------- | -------------------------------------------------- |
+| `client`      | Vercel        | Static Vite build (SPA)                            |
+| `server`      | Render        | Express API + Socket.IO (Node web service)         |
+| Database      | MongoDB Atlas | The only database                                  |
 | `public-site` | Apache Tomcat | Unchanged — see [TOMCAT_SETUP.md](TOMCAT_SETUP.md) |
 
 Deploy the database first, then the API, then the client (the client needs the API URL
@@ -42,23 +42,22 @@ and the API needs the client URL for CORS and QR links).
 Create a **Web Service** from this repository (Render reads `server/` directly; no
 Docker needed).
 
-| Setting             | Value                                                     |
-| ------------------- | --------------------------------------------------------- |
-| Root directory      | `server`                                                  |
-| Build command       | `npm install`                                             |
-| Start command       | `npm start`                                               |
-| Health check path   | `/api/health`                                             |
-| Instance type       | Free/Starter is fine for a demo (it sleeps when idle)     |
+| Setting           | Value                                                 |
+| ----------------- | ----------------------------------------------------- |
+| Root directory    | `server`                                              |
+| Build command     | `npm install`                                         |
+| Start command     | `npm start`                                           |
+| Health check path | `/api/health`                                         |
+| Instance type     | Free/Starter is fine for a demo (it sleeps when idle) |
 
 Environment variables:
 
-| Key          | Value                                                        |
-| ------------ | ------------------------------------------------------------ |
-| `MONGO_URI`  | the Atlas SRV string from step 1                              |
+| Key          | Value                                                                                        |
+| ------------ | -------------------------------------------------------------------------------------------- |
+| `MONGO_URI`  | the Atlas SRV string from step 1                                                             |
 | `JWT_SECRET` | long random hex — `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"` |
-| `CLIENT_URL` | `https://your-app.vercel.app` (CORS + QR links)               |
-| `API_URL`    | `https://your-api.onrender.com` (optional, for docs/links)    |
-| `PORT`       | leave unset — Render injects its own                        |
+| `CLIENT_URL` | `https://your-app.vercel.app` (CORS + QR links)                                              |
+| `PORT`       | leave unset — Render injects its own                                                         |
 
 Notes:
 
@@ -88,12 +87,12 @@ curl -X POST https://your-api.onrender.com/api/auth/login \
 
 Create a **New Project** from the repository.
 
-| Setting              | Value                          |
-| -------------------- | ------------------------------ |
-| Root directory       | `client`                       |
-| Framework preset     | Vite                           |
-| Build command        | `npm run build`                |
-| Output directory     | `dist`                         |
+| Setting              | Value                                        |
+| -------------------- | -------------------------------------------- |
+| Root directory       | `client`                                     |
+| Framework preset     | Vite                                         |
+| Build command        | `npm run build`                              |
+| Output directory     | `dist`                                       |
 | Environment variable | `VITE_API_URL=https://your-api.onrender.com` |
 
 `client/vercel.json` rewrites every path to `index.html`, so deep links such as

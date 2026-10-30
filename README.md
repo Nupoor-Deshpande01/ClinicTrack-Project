@@ -73,7 +73,7 @@ cd client && npm run dev          # in a second terminal
 
 `dev:memory` is a demo helper only — data disappears when the process stops.
 
-### Phase 4 demo screens
+### Wow-feature screens
 
 | URL                | What it shows                                               |
 | ------------------ | ----------------------------------------------------------- |
@@ -85,6 +85,27 @@ cd client && npm run dev          # in a second terminal
 | `/audit`           | Hash-chained trail + **Verify integrity**                   |
 
 Socket.IO shares the API port; the Vite dev proxy forwards `/socket.io`.
+
+## Documentation
+
+| File                                                                                 | Contents                                                        |
+| ------------------------------------------------------------------------------------ | --------------------------------------------------------------- |
+| [docs/API.md](docs/API.md)                                                           | Every endpoint: payloads, roles, responses and error catalogue  |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)                                             | Vercel (client) + Render (API) + MongoDB Atlas                  |
+| [docs/TOMCAT_SETUP.md](docs/TOMCAT_SETUP.md)                                         | Deploying `public-site/` to Apache Tomcat                       |
+| [docs/clinictrack.postman_collection.json](docs/clinictrack.postman_collection.json) | Importable Postman collection (30 requests, auto-saves the JWT) |
+
+## Syllabus coverage (quick map)
+
+| Practical / outcome          | Where it lives                                                                               |
+| ---------------------------- | -------------------------------------------------------------------------------------------- |
+| HTML5, CSS3, Bootstrap 5     | `public-site/` (landing, doctors carousel, appointment form)                                 |
+| Vanilla JS, JSON + arrays    | `public-site/js/appointment.js`, `chat.js`, `tools.js`                                       |
+| ReactJS, routing, validation | `client/src` (RHF + Yup schemas, role-guarded routes)                                        |
+| NodeJS core modules          | `crypto`/`events` (audit chain), `fs`/`stream` (exports), `os` (health), `path`, `node-cron` |
+| ExpressJS, REST + middleware | `server/app.js`, `server/routes`, `server/middleware`                                        |
+| MongoDB with Mongoose        | `server/models` + aggregation in `server/controllers/analytics.controller.js`                |
+| Client vs server validation  | Yup in `client/src/validation/schemas.js` vs express-validator in every route                |
 
 ## Demo logins _(set by the seed script)_
 
@@ -126,4 +147,6 @@ Socket.IO shares the API port; the Vite dev proxy forwards `/socket.io`.
   in Phase 3), tamper-evident audit log with _Verify integrity_, PDF prescription with QR +
   public verification page, Socket.IO live queue and Now Serving board, analytics reports
   (visits per day, top diagnoses, new vs returning, peak hours), and streamed JSON/CSV exports.
-- **Phase 5:** polish, API.md, Postman collection, deployment notes.
+- **Phase 5 (done):** polish — full [API.md](docs/API.md), Postman collection, deployment guide,
+  vendor chunk splitting, responsive pass over every screen at 390 px, consistent
+  loading/error/empty states, and a stray duplicate heading removed.

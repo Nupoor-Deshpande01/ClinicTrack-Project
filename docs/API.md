@@ -20,35 +20,35 @@ RESTful API for ClinicTrack (Express + MongoDB). Base URL in development:
 
 ## Conventions
 
-| Item            | Rule                                                                        |
-| --------------- | --------------------------------------------------------------------------- |
-| Auth            | `Authorization: Bearer <JWT>` on every route except login and QR verify      |
-| Content type    | `application/json` for request bodies (PDF/CSV responses are binary/streams) |
-| Success shape   | `{ success: true, message?: string, data: …, meta?: { … } }`                 |
-| Error shape     | `{ success: false, message: string, errors?: [{ field, message }] }`        |
-| Validation      | `express-validator` on the server, independent of the React/Yup rules        |
-| Pagination      | `?page=1&limit=10` → `meta: { page, limit, total, pages }`                    |
-| Rate limits     | 500 requests / 15 min per IP; login is limited to 20 / 15 min                |
-| Roles           | `doctor`, `staff` (reception), `admin`                                       |
+| Item            | Rule                                                                                         |
+| --------------- | -------------------------------------------------------------------------------------------- |
+| Auth            | `Authorization: Bearer <JWT>` on every route except login and QR verify                      |
+| Content type    | `application/json` for request bodies (PDF/CSV responses are binary/streams)                 |
+| Success shape   | `{ success: true, message?: string, data: …, meta?: { … } }`                                 |
+| Error shape     | `{ success: false, message: string, errors?: [{ field, message }] }`                         |
+| Validation      | `express-validator` on the server, independent of the React/Yup rules                        |
+| Pagination      | `?page=1&limit=10` → `meta: { page, limit, total, pages }`                                   |
+| Rate limits     | 500 requests / 15 min per IP; login is limited to 20 / 15 min                                |
+| Roles           | `doctor`, `staff` (reception), `admin`                                                       |
 | Clinical data   | Visits, notes, prescriptions and the audit trail are doctor/admin only; reception gets `403` |
-| Password hashes | Never selected (`select: false`) and never serialised                        |
+| Password hashes | Never selected (`select: false`) and never serialised                                        |
 
 **Role matrix**
 
-| Resource       | doctor | staff | admin |
-| -------------- | :----: | :---: | :---: |
-| Login / me     |   ✓    |   ✓   |   ✓   |
-| Patients list/read (demographics) | ✓ | ✓ | ✓ |
-| Patient create | ✓ | ✓ | ✓ |
-| Patient update / allergies | ✓ | ✗ | ✓ |
-| Visits (all)   | ✓ | ✗ | ✓ |
-| Prescriptions  | ✓ | ✗ | ✓ |
-| Appointments   | ✓ | ✓ | ✓ |
-| Queue          | ✓ | ✓ | ✓ |
-| Audit log      | ✓ | ✗ | ✓ |
-| Analytics      | ✓ | ✗ | ✓ |
-| Users          | doctors only | doctors only | all |
-| Export         | ✗ | ✗ | ✓ |
+| Resource                          |    doctor    |    staff     | admin |
+| --------------------------------- | :----------: | :----------: | :---: |
+| Login / me                        |      ✓       |      ✓       |   ✓   |
+| Patients list/read (demographics) |      ✓       |      ✓       |   ✓   |
+| Patient create                    |      ✓       |      ✓       |   ✓   |
+| Patient update / allergies        |      ✓       |      ✗       |   ✓   |
+| Visits (all)                      |      ✓       |      ✗       |   ✓   |
+| Prescriptions                     |      ✓       |      ✗       |   ✓   |
+| Appointments                      |      ✓       |      ✓       |   ✓   |
+| Queue                             |      ✓       |      ✓       |   ✓   |
+| Audit log                         |      ✓       |      ✗       |   ✓   |
+| Analytics                         |      ✓       |      ✗       |   ✓   |
+| Users                             | doctors only | doctors only |  all  |
+| Export                            |      ✗       |      ✗       |   ✓   |
 
 ## Auth
 
@@ -121,14 +121,14 @@ Any role. Same single-patient shape (`data`), clinical fields trimmed for staff.
 
 `doctor | staff | admin`. Server-side rules (independent of the browser):
 
-| Field        | Rule                                                    |
-| ------------ | ------------------------------------------------------- |
-| `fullName`   | letters, spaces, dots, hyphens; 2–60 characters          |
-| `phone`      | Indian mobile: exactly 10 digits starting 6–9            |
-| `dob`        | ISO date, strictly in the past                           |
-| `gender`     | `male` / `female` / `other`                              |
-| `allergies`  | optional array of strings, each ≤ 60 characters          |
-| `bloodGroup` | optional enum                                            |
+| Field        | Rule                                            |
+| ------------ | ----------------------------------------------- |
+| `fullName`   | letters, spaces, dots, hyphens; 2–60 characters |
+| `phone`      | Indian mobile: exactly 10 digits starting 6–9   |
+| `dob`        | ISO date, strictly in the past                  |
+| `gender`     | `male` / `female` / `other`                     |
+| `allergies`  | optional array of strings, each ≤ 60 characters |
+| `bloodGroup` | optional enum                                   |
 
 `201` — the response carries a **duplicate warning** when another patient shares the phone:
 
@@ -138,7 +138,10 @@ Any role. Same single-patient shape (`data`), clinical fields trimmed for staff.
   "message": "Patient saved — note: same mobile number already belongs to patient MC-00028 (Nikhil Bhosale).",
   "data": { "id": "…", "mrn": "MC-00031", "fullName": "…" },
   "warnings": [
-    { "field": "phone", "message": "Duplicate mobile number shared with MC-00028 · Nikhil Bhosale." }
+    {
+      "field": "phone",
+      "message": "Duplicate mobile number shared with MC-00028 · Nikhil Bhosale."
+    }
   ]
 }
 ```
@@ -186,7 +189,10 @@ Validation: `visitDate` ISO and not in the future, `diagnosis` 2–200 chars,
 plus **required** `changeReason` (4–300 characters).
 
 ```json
-{ "diagnosis": "Acute viral fever (revised after lab report)", "changeReason": "Lab report received" }
+{
+  "diagnosis": "Acute viral fever (revised after lab report)",
+  "changeReason": "Lab report received"
+}
 ```
 
 `201` `{ message: "New version v2 stored — history of v1 preserved.", data: { … } }`.
@@ -285,7 +291,9 @@ the JWT.
     "issuedAt": "2026-10-30T08:31:39.000Z",
     "patient": { "fullName": "Ishita Jadhav", "mrn": "MC-00005" },
     "doctor": { "name": "Rohan Jadhav", "specialty": "Paediatrics" },
-    "medicines": [ { "name": "Paracetamol", "dosage": "500 mg", "frequency": "1-0-1", "durationDays": 3 } ],
+    "medicines": [
+      { "name": "Paracetamol", "dosage": "500 mg", "frequency": "1-0-1", "durationDays": 3 }
+    ],
     "advice": "Plenty of fluids…"
   }
 }
@@ -391,7 +399,11 @@ insertion order.
 Intact:
 
 ```json
-{ "success": true, "message": "All 42 entries verified.", "data": { "valid": true, "checked": 42, "total": 42 } }
+{
+  "success": true,
+  "message": "All 42 entries verified.",
+  "data": { "valid": true, "checked": 42, "total": 42 }
+}
 ```
 
 Tampered (`200`, so the UI can render it):
@@ -426,13 +438,22 @@ Tampered (`200`, so the UI can render it):
 {
   "success": true,
   "data": {
-    "stats": { "totalPatients": 30, "visitsToday": 5, "pendingFollowUps": 8, "activeQueue": 4, "appointmentsToday": 3 },
-    "arrivalSeries": [ { "month": "May", "in": 0, "out": 6 } ],
-    "doctors": [ { "id": "…", "name": "Anjali Deshmukh", "specialty": "Cardiology" } ],
-    "visitTrend": [ { "date": "2026-10-17", "label": "17 Oct", "count": 0 } ],
-    "topDiagnoses": [ { "diagnosis": "Acute viral fever", "count": 14 } ],
-    "newVsReturning": [ { "name": "New patients", "value": 10 }, { "name": "Returning patients", "value": 20 } ],
-    "peakHours": [ { "hour": "09:00", "count": 6 } ]
+    "stats": {
+      "totalPatients": 30,
+      "visitsToday": 5,
+      "pendingFollowUps": 8,
+      "activeQueue": 4,
+      "appointmentsToday": 3
+    },
+    "arrivalSeries": [{ "month": "May", "in": 0, "out": 6 }],
+    "doctors": [{ "id": "…", "name": "Anjali Deshmukh", "specialty": "Cardiology" }],
+    "visitTrend": [{ "date": "2026-10-17", "label": "17 Oct", "count": 0 }],
+    "topDiagnoses": [{ "diagnosis": "Acute viral fever", "count": 14 }],
+    "newVsReturning": [
+      { "name": "New patients", "value": 10 },
+      { "name": "Returning patients", "value": 20 }
+    ],
+    "peakHours": [{ "hour": "09:00", "count": 6 }]
   }
 }
 ```
@@ -480,22 +501,22 @@ Connect to the API origin with the JWT in the handshake:
 io('http://localhost:5000', { auth: { token } });
 ```
 
-| Event          | Direction | Payload                                                    |
-| -------------- | --------- | ---------------------------------------------------------- |
-| `queue:update` | server→client | the full queue snapshot (`{ data, stats }`)              |
+| Event          | Direction     | Payload                                     |
+| -------------- | ------------- | ------------------------------------------- |
+| `queue:update` | server→client | the full queue snapshot (`{ data, stats }`) |
 
 Unauthenticated sockets are rejected. Clients refetch `GET /queue` on mount and treat
 `queue:update` as authoritative afterwards.
 
 ## Error catalogue
 
-| Status | When                                                                       |
-| ------ | -------------------------------------------------------------------------- |
-| `400`  | Semantically impossible request (diff across patients, no fields to update) |
-| `401`  | Missing/expired/invalid JWT, wrong credentials                              |
-| `403`  | Role not allowed (reception reading visits, non-admin export)               |
-| `404`  | Unknown id, route or QR token                                               |
-| `409`  | Edit/rollback on a non-current version, duplicate email                     |
+| Status | When                                                                         |
+| ------ | ---------------------------------------------------------------------------- |
+| `400`  | Semantically impossible request (diff across patients, no fields to update)  |
+| `401`  | Missing/expired/invalid JWT, wrong credentials                               |
+| `403`  | Role not allowed (reception reading visits, non-admin export)                |
+| `404`  | Unknown id, route or QR token                                                |
+| `409`  | Edit/rollback on a non-current version, duplicate email                      |
 | `422`  | `express-validator` failures; body carries `errors[]` with `field`+`message` |
-| `429`  | Rate limit exceeded                                                         |
-| `500`  | Unexpected server error (central handler, stack only in server logs)        |
+| `429`  | Rate limit exceeded                                                          |
+| `500`  | Unexpected server error (central handler, stack only in server logs)         |

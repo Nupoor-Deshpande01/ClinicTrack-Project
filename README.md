@@ -110,3 +110,4 @@ cd client && npm run dev          # in a second terminal
   builder, appointments and admin users screens.
 - **Phase 4:** wow features (audit chain, allergy alerts, PDF+QR, live queue, analytics).
 - **Phase 5:** polish, API.md, Postman collection, deployment notes.
+# ClinicTrack-Project

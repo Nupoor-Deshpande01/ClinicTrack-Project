@@ -15,6 +15,7 @@ const User = require('../models/user.model');
 const Patient = require('../models/patient.model');
 const Visit = require('../models/visit.model');
 const AuditLog = require('../models/auditLog.model');
+const Appointment = require('../models/appointment.model');
 
 const FIRST = [
   'Aarav',
@@ -65,11 +66,13 @@ const NOTES_SNIPPET =
   'General condition stable. Advised hydration and rest. Discussed medication schedule.';
 
 function patientAt(i) {
-  const first = FIRST[i % FIRST.length];
+  // FIRST[0-9] are male given names, FIRST[10-19] female, so name and gender agree.
+  const g = i % 3 === 0 ? 'other' : i % 2 === 0 ? 'female' : 'male';
+  const firstPool = g === 'male' ? FIRST.slice(0, 10) : g === 'female' ? FIRST.slice(10) : FIRST;
+  const first = firstPool[i % firstPool.length];
   const last = LAST[i % LAST.length];
   const age = 25 + ((i * 7) % 45); // ages 25-69, spread deterministically
   const dob = new Date(new Date().getFullYear() - age, (i * 5) % 12, ((i * 9) % 27) + 1);
-  const g = i % 3 === 0 ? 'other' : i % 2 === 0 ? 'female' : 'male';
   return {
     // MRN assigned HERE (not by the pre-save hook) so the 30-doc bulk insert
     // never races: batch hooks all read the same count before any insert lands.
@@ -100,6 +103,7 @@ async function runSeed(opts = {}) {
     Patient.deleteMany({}),
     Visit.deleteMany({}),
     AuditLog.deleteMany({}),
+    Appointment.deleteMany({}),
   ]);
 
   const users = await User.create([
@@ -144,7 +148,9 @@ async function runSeed(opts = {}) {
   for (const [i, patient] of patientDocs.entries()) {
     const nVisits = 1 + (i % 3); // 1-3 visits
     for (let k = 0; k < nVisits; k++) {
-      const daysAgo = 60 - k * 15 - (i % 7);
+      // Spread visits from today back to ~30 days so a fresh seed shows both
+      // visits today and a realistic handful of overdue follow-ups.
+      const daysAgo = (i % 7) * 5 + k * 20;
       const btn = DIAGNOSES[(i + k) % DIAGNOSES.length];
       const v = await Visit.create({
         patientId: patient._id,
@@ -209,7 +215,32 @@ async function runSeed(opts = {}) {
     );
   }
 
-  const summary = { users: users.length, patients: patientDocs.length, visits: visitsMade.length };
+  // ---- appointments: today + the next few days (dashboard date strip) ----
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const appointmentDocs = [];
+  for (let i = 0; i < 18; i++) {
+    const dayOffset = i % 6; // spread across today .. +5 days
+    const at = new Date(today);
+    at.setDate(at.getDate() + dayOffset);
+    at.setHours(9 + (i % 8), i % 2 ? 30 : 0, 0, 0);
+    appointmentDocs.push({
+      patientId: patientDocs[i]._id,
+      doctorId: patientDocs[i].primaryDoctorId,
+      scheduledAt: at,
+      disease: ['Fever', 'Follow-up', 'Blood pressure check', 'Skin rash', 'Vaccination'][i % 5],
+      status: 'scheduled',
+      createdBy: users[2]._id,
+    });
+  }
+  await Appointment.create(appointmentDocs);
+
+  const summary = {
+    users: users.length,
+    patients: patientDocs.length,
+    visits: visitsMade.length,
+    appointments: appointmentDocs.length,
+  };
   console.log('Seed complete:', JSON.stringify(summary));
 
   if (opts.standalone) await mongoose.disconnect();

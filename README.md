@@ -53,18 +53,27 @@ npm run format:check
 
 ## Scripts (root)
 
-| Script                 | What it does                           |
-| ---------------------- | -------------------------------------- |
-| `npm run lint`         | ESLint over the whole monorepo         |
-| `npm run lint:fix`     | ESLint with auto-fix                   |
-| `npm run format`       | Prettier — format all files            |
-| `npm run format:check` | Prettier — CI-style format check       |
-| `npm run seed`         | Seed dummy data (once Phase 2 is done) |
-| `npm run dev:server`   | Start Express API dev server (Phase 2) |
-| `npm run dev:client`   | Start Vite dev server (Phase 3)        |
-| `npm run build:client` | Production React build (Phase 3)       |
+| Script                 | What it does                        |
+| ---------------------- | ----------------------------------- |
+| `npm run lint`         | ESLint over the whole monorepo      |
+| `npm run lint:fix`     | ESLint with auto-fix                |
+| `npm run format`       | Prettier — format all files         |
+| `npm run format:check` | Prettier — CI-style format check    |
+| `npm run seed`         | Seed dummy data into MongoDB        |
+| `npm run dev:server`   | Start the Express API (`:5000`)     |
+| `npm run dev:client`   | Start the Vite dev server (`:5173`) |
+| `npm run build:client` | Production React build              |
 
-## Demo logins _(set by the seed script — Phase 2)_
+### Run the API without installing MongoDB
+
+```bash
+cd server && npm run dev:memory   # in-memory MongoDB, auto-seeded, port 5000
+cd client && npm run dev          # in a second terminal
+```
+
+`dev:memory` is a demo helper only — data disappears when the process stops.
+
+## Demo logins _(set by the seed script)_
 
 | Role              | Email                | Password     |
 | ----------------- | -------------------- | ------------ |
@@ -78,23 +87,26 @@ npm run format:check
 - [x] Appointment form with inline validation errors
 - [x] Chat window widget
 - [x] Tools page (BMI, paeds dose, slot picker)
-- [ ] Login screen
-- [ ] Dashboard (stat cards, arrival chart, specialists, appointments)
-- [ ] Patient list with search/filter/pagination
-- [ ] Visit form + validation errors
-- [ ] Visit timeline with versions
-- [ ] Side-by-side diff with red/green highlighting
+- [x] Login screen
+- [x] Dashboard (stat cards, arrival chart, specialists, appointments)
+- [x] Patient list with search/filter/pagination
+- [x] Visit form + validation errors
+- [x] Visit timeline with versions
+- [x] Side-by-side diff with red/green highlighting
 - [ ] Prescription builder + PDF
+- [ ] Admin users + appointments pages
 - [ ] Live queue board
 - [ ] Analytics screen
 - [ ] Audit log + "Verify Integrity" pass/fail states
-- [ ] Dark mode + mobile layout
+- [x] Dark mode + mobile layout
 
 ## Modules in progress
 
 - **Phase 0 (done):** monorepo scaffold, git, linting, env files, README skeleton.
 - **Phase 1 (done):** public-site (landing, appointment form, chat widget, tools, Tomcat guide).
-- **Phase 2:** backend foundation (models, auth, patients, versioned visits, seed).
-- **Phase 3:** React app (theme, layout, auth, dashboard, patients, visits, diff, prescriptions).
+- **Phase 2 (done):** backend foundation (models, auth, patients, versioned visits, seed, smoke tests).
+- **Phase 3 (done):** React app — theme + dark mode, sidebar/topbar shell, JWT auth + role guards,
+  dashboard, patients (list/register/profile), visit form, timeline, diff viewer, prescription
+  builder, appointments and admin users screens.
 - **Phase 4:** wow features (audit chain, allergy alerts, PDF+QR, live queue, analytics).
 - **Phase 5:** polish, API.md, Postman collection, deployment notes.

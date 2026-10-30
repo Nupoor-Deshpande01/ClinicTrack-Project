@@ -50,6 +50,7 @@ export default [
       ecmaVersion: 2022,
       sourceType: 'module',
       globals: { ...globals.browser },
+      parserOptions: { ecmaFeatures: { jsx: true } },
     },
     plugins: {
       react,
@@ -60,6 +61,8 @@ export default [
       ...react.configs.flat.recommended.rules,
       ...reactHooks.configs.recommended.rules,
       'react/prop-types': 'off', // props come from well-typed components in this small project
+      'react/react-in-jsx-scope': 'off', // React 18 automatic JSX runtime (Vite)
+      'react/no-unescaped-entities': 'off', // plain apostrophes in copy read fine
     },
   },
 ];

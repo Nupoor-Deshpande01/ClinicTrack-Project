@@ -354,7 +354,111 @@ async function main() {
       ''
     );
 
-    /* ---------- 6. JSON envelope + unknown route ---------- */
+    /* ---------- 6. Phase 3 surface: analytics, appointments, users, prescriptions ---------- */
+    const analytics = await api(port, '/api/analytics/summary?months=6', { token: docTok });
+    const stats = analytics.json.data?.stats || {};
+    check(
+      'analytics: stat fields present',
+      analytics.status === 200 &&
+        stats.totalPatients >= 30 &&
+        typeof stats.visitsToday === 'number' &&
+        typeof stats.pendingFollowUps === 'number',
+      JSON.stringify(stats)
+    );
+    check(
+      'analytics: 6-month arrival series',
+      analytics.json.data.arrivalSeries.length === 6 &&
+        analytics.json.data.arrivalSeries.every(m => 'in' in m && 'out' in m)
+    );
+    check(
+      'analytics: doctors listed for specialist panel',
+      analytics.json.data.doctors.length === 2
+    );
+
+    const appts = await api(port, '/api/appointments', { token: staffTok });
+    check(
+      'appointments: today list populated',
+      appts.status === 200 && appts.json.data.length >= 1 && appts.json.data[0].patient?.fullName,
+      JSON.stringify(appts.json.meta)
+    );
+
+    const newAppt = await api(port, '/api/appointments', {
+      method: 'POST',
+      token: staffTok,
+      body: {
+        patientId: pid,
+        doctorId: analytics.json.data.doctors[0].id,
+        scheduledAt: new Date(Date.now() + 3600 * 1000).toISOString(),
+        disease: 'Fever',
+      },
+    });
+    check('appointments: staff can book', newAppt.status === 201, JSON.stringify(newAppt.json));
+    const delAppt = await api(port, `/api/appointments/${newAppt.json.data.id}`, {
+      method: 'DELETE',
+      token: staffTok,
+    });
+    check('appointments: delete works', delAppt.status === 200);
+
+    const usersAdmin = await api(port, '/api/users', {
+      token: (
+        await api(port, '/api/auth/login', {
+          method: 'POST',
+          body: { email: 'admin@clinic.test', password: 'Admin@123' },
+        })
+      ).json.token,
+    });
+    check(
+      'users: admin sees all 4 accounts',
+      usersAdmin.status === 200 && usersAdmin.json.data.length === 4
+    );
+    const usersDoctor = await api(port, '/api/users', { token: docTok });
+    check(
+      'users: doctor sees only doctors',
+      usersDoctor.status === 200 &&
+        usersDoctor.json.data.every(u => u.role === 'doctor' && u.email === undefined)
+    );
+
+    const badRx = await api(port, `/api/visits/${rb.json.data.id}/prescription`, {
+      method: 'POST',
+      token: docTok,
+      body: {
+        medicines: [
+          { name: 'Paracetamol', dosage: 'one big pill', frequency: '1-0-1', durationDays: 3 },
+        ],
+      },
+    });
+    check(
+      'prescription: non-conforming dosage → 422',
+      badRx.status === 422 && badRx.json.errors.some(e => e.field.includes('dosage')),
+      JSON.stringify(badRx.json.errors)
+    );
+
+    const rx = await api(port, `/api/visits/${rb.json.data.id}/prescription`, {
+      method: 'POST',
+      token: docTok,
+      body: {
+        medicines: [{ name: 'Paracetamol', dosage: '500 mg', frequency: '1-0-1', durationDays: 3 }],
+        advice: 'Rest and fluids',
+      },
+    });
+    check(
+      'prescription: doctor creates with QR token',
+      rx.status === 201 && rx.json.data.qrToken?.length === 32,
+      JSON.stringify(rx.json)
+    );
+    const rxList = await api(port, `/api/visits/${rb.json.data.id}/prescriptions`, {
+      token: docTok,
+    });
+    check(
+      'prescription: listed for the visit',
+      rxList.status === 200 && rxList.json.data.length === 1
+    );
+    const rxStaff = await api(port, `/api/visits/${rb.json.data.id}/prescriptions`, {
+      token: staffTok,
+    });
+    check('role rule: staff cannot read prescriptions → 403', rxStaff.status === 403);
+
+    /* ---------- 7. JSON envelope + unknown route ---------- */
     const unknown = await api(port, '/api/nonsense', { token: docTok });
     check(
       'unknown route → 404 envelope',
@@ -380,7 +484,7 @@ async function main() {
     FAIL.forEach(f => console.log(`  FAIL ${f.name} — ${f.detail}`));
     process.exit(1);
   }
-  console.log('All Phase 2 backend checks passed.');
+  console.log('All backend smoke checks passed.');
 }
 
 main().catch(err => {

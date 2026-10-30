@@ -22,6 +22,10 @@ const os = require('os'); // core module: powers the health endpoint
 const authRoutes = require('./routes/auth.routes');
 const patientRoutes = require('./routes/patient.routes');
 const visitRoutes = require('./routes/visit.routes');
+const prescriptionRoutes = require('./routes/prescription.routes');
+const appointmentRoutes = require('./routes/appointment.routes');
+const analyticsRoutes = require('./routes/analytics.routes');
+const userRoutes = require('./routes/user.routes');
 const { centralErrorHandler } = require('./middleware/error');
 const { isDBConnected } = require('./config/db');
 
@@ -75,6 +79,10 @@ function createApp() {
   app.use('/api/auth', authRoutes);
   app.use('/api/patients', patientRoutes);
   app.use('/api/visits', visitRoutes);
+  app.use('/api/visits', prescriptionRoutes); // Phase 3: POST/GET prescription by visit
+  app.use('/api/appointments', appointmentRoutes);
+  app.use('/api/analytics', analyticsRoutes);
+  app.use('/api/users', userRoutes);
 
   // ---- unknown route + central error handler (ALWAYS last) ----
   app.use((req, res) => {

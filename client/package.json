@@ -2,12 +2,28 @@
   "name": "clinictrack-client",
   "version": "0.1.0",
   "private": true,
-  "description": "ClinicTrack React app (Vite + React Router). Built out in Phase 3.",
+  "description": "ClinicTrack React app (Vite + React Router)",
   "type": "module",
   "scripts": {
-    "dev": "echo \"client scripts arrive in Phase 3\" && exit 0",
-    "build": "echo \"client build arrives in Phase 3\" && exit 0"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
-  "dependencies": {},
-  "devDependencies": {}
+  "dependencies": {
+    "@hookform/resolvers": "^3.9.0",
+    "axios": "^1.7.7",
+    "bootstrap": "^5.3.3",
+    "lucide-react": "^0.454.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-hook-form": "^7.53.0",
+    "react-hot-toast": "^2.4.1",
+    "react-router-dom": "^6.27.0",
+    "recharts": "^2.13.0",
+    "yup": "^1.4.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.2",
+    "vite": "^5.4.8"
+  }
 }

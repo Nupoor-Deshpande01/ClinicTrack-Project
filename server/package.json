@@ -8,6 +8,7 @@
     "start": "node index.js",
     "dev": "nodemon index.js",
     "seed": "node seed/seed.js",
+    "dev:memory": "node scripts/dev-memory.js",
     "test": "node scripts/smoke.js"
   },
   "dependencies": {

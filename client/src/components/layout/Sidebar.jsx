@@ -17,22 +17,22 @@ import {
 import { useAuth } from '../../context/AuthContext';
 
 /**
- * Primary navigation. Items for Phase 4 features are visible but disabled
- * (with a "Soon" tag) so the sidebar matches the spec without dead links.
+ * Primary navigation. `clinical: true` items are hidden from reception, which
+ * mirrors the server's role guard (it refuses clinical reads with 403).
  */
 const MAIN_ITEMS = [
   { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/patients', label: 'Patients', icon: Users2 },
   { to: '/patients', label: 'Visits and Timeline', icon: Stethoscope, end: true },
   { to: '/appointments', label: 'Appointments', icon: CalendarDays },
-  { label: 'Prescriptions', icon: Pill, soon: true },
-  { label: 'Live Queue', icon: MonitorPlay, soon: true },
-  { label: 'Analytics and Reports', icon: BarChart3, soon: true },
-  { label: 'Audit Log', icon: ScrollText, soon: true },
+  { to: '/prescriptions', label: 'Prescriptions', icon: Pill, clinical: true },
+  { to: '/queue', label: 'Live Queue', icon: MonitorPlay },
+  { to: '/analytics', label: 'Analytics and Reports', icon: BarChart3, clinical: true },
+  { to: '/audit', label: 'Audit Log', icon: ScrollText, clinical: true },
 ];
 
 export default function Sidebar({ open, onClose }) {
-  const { user, logout, isAdmin } = useAuth();
+  const { user, logout, isAdmin, isClinical } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -71,19 +71,8 @@ export default function Sidebar({ open, onClose }) {
 
         <p className="ct-nav-heading">Menu</p>
         <nav className="ct-nav">
-          {MAIN_ITEMS.map(({ to, label, icon: Icon, soon }) =>
-            soon ? (
-              <span
-                key={label}
-                className="ct-nav-item is-disabled"
-                aria-disabled="true"
-                title="Arrives in Phase 4"
-              >
-                <Icon size={18} aria-hidden="true" />
-                <span>{label}</span>
-                <em className="ct-soon">Soon</em>
-              </span>
-            ) : (
+          {MAIN_ITEMS.filter(item => !item.clinical || isClinical).map(
+            ({ to, label, icon: Icon }) => (
               <NavLink
                 key={label}
                 to={to}

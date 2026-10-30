@@ -1,16 +1,22 @@
 /**
- * prescription.routes.js — /api/visits/:id/prescription and
- * /api/visits/:id/prescriptions. Mounted at /api/visits (patient-scoped
- * clinical data), so every route here is doctor/admin only.
+ * prescription.routes.js — two routers in one file because they share the
+ * same validation rules:
+ *
+ *  visitsRouter        → /api/visits/:id/prescription(s)   (clinical roles)
+ *  prescriptionsRouter → /api/prescriptions                (PDF + list, clinical roles)
+ *                        /api/prescriptions/verify/:qrToken (PUBLIC — QR scan)
  */
 const express = require('express');
-const { createPrescription, listForVisit } = require('../controllers/prescription.controller');
+const { body, param } = require('express-validator');
+const {
+  createPrescription,
+  listForVisit,
+  listRecent,
+  prescriptionPdf,
+  verifyPrescription,
+} = require('../controllers/prescription.controller');
 const { protect, authorize } = require('../middleware/auth');
 const { validate } = require('../middleware/validate');
-const { body, param } = require('express-validator');
-
-const router = express.Router();
-router.use(protect, authorize('doctor', 'admin'));
 
 const medicineRules = [
   body('medicines').isArray({ min: 1 }).withMessage('At least one medicine is required'),
@@ -31,11 +37,35 @@ const medicineRules = [
   body('advice').optional().isString().isLength({ max: 500 }).withMessage('Advice max 500 chars'),
 ];
 
-router.post(
+// ---- /api/visits/:id/prescription(s) ----
+const visitsRouter = express.Router();
+visitsRouter.use(protect, authorize('doctor', 'admin'));
+
+visitsRouter.post(
   '/:id/prescription',
   validate([param('id').isMongoId(), ...medicineRules]),
   createPrescription
 );
-router.get('/:id/prescriptions', validate([param('id').isMongoId()]), listForVisit);
+visitsRouter.get('/:id/prescriptions', validate([param('id').isMongoId()]), listForVisit);
 
-module.exports = router;
+// ---- /api/prescriptions ----
+const prescriptionsRouter = express.Router();
+
+// Public: the QR code on every printed prescription points here.
+prescriptionsRouter.get(
+  '/verify/:qrToken',
+  validate([param('qrToken').isLength({ min: 16, max: 64 })]),
+  verifyPrescription
+);
+
+prescriptionsRouter.get('/', protect, authorize('doctor', 'admin'), listRecent);
+prescriptionsRouter.get(
+  '/:id/pdf',
+  protect,
+  authorize('doctor', 'admin'),
+  validate([param('id').isMongoId()]),
+  prescriptionPdf
+);
+
+module.exports = visitsRouter;
+module.exports.prescriptions = prescriptionsRouter;

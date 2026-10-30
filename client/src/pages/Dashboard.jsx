@@ -203,7 +203,7 @@ export default function Dashboard() {
           icon={ListOrdered}
           label="Active Queue"
           value={stats.activeQueue}
-          note="Live queue arrives in Phase 4"
+          note="Waiting + in consultation"
           data={chartData}
           dataKey="in"
           color="var(--ct-primary)"

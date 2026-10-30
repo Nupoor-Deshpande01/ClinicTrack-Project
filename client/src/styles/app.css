@@ -869,3 +869,281 @@ a {
     display: none;
   }
 }
+
+/* ---------- phase 4: analytics ---------- */
+.ct-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-top: 0.9rem;
+}
+
+/* ---------- phase 4: live queue ---------- */
+.ct-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ct-muted);
+  border: 1px solid var(--ct-border);
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem;
+  background: var(--ct-surface);
+}
+
+.ct-live.is-on {
+  color: var(--ct-success);
+  border-color: transparent;
+  background: var(--ct-success-light);
+}
+
+.ct-queue-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-bottom: 0.9rem;
+}
+
+.ct-queue-stat {
+  padding: 0.9rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.ct-queue-stat strong {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.ct-queue-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.4fr) auto;
+  gap: 0.8rem;
+  align-items: end;
+}
+
+.ct-queue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.ct-queue-card {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid var(--ct-border);
+}
+
+.ct-queue-card.is-serving {
+  border-left-color: var(--ct-primary);
+  background: var(--ct-primary-light);
+}
+.ct-queue-card.is-waiting {
+  border-left-color: var(--ct-warning);
+}
+.ct-queue-card.is-done {
+  opacity: 0.75;
+  border-left-color: var(--ct-success);
+}
+
+.ct-token {
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+  color: var(--ct-primary);
+  min-width: 3ch;
+}
+
+/* ---------- phase 4: waiting-room board ---------- */
+.ct-board {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  padding: clamp(1rem, 3vw, 2.5rem);
+  background:
+    radial-gradient(circle at 15% 0%, rgba(37, 99, 235, 0.18), transparent 55%), var(--ct-page);
+}
+
+.ct-board-head,
+.ct-board-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.ct-board-clock {
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.ct-board-muted {
+  color: var(--ct-muted);
+  font-size: 0.85rem;
+}
+
+.ct-board-main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr);
+  gap: 1rem;
+}
+
+.ct-board-label {
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ct-muted);
+}
+
+.ct-board-serving,
+.ct-board-next {
+  border-radius: 24px;
+  padding: clamp(1.2rem, 3vw, 2.4rem);
+  background: var(--ct-surface);
+  box-shadow: var(--ct-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ct-board-serving {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: linear-gradient(160deg, var(--ct-primary), #1e40af);
+  color: #fff;
+}
+
+.ct-board-serving .ct-board-label,
+.ct-board-serving .ct-board-muted {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.ct-board-token {
+  font-size: clamp(4rem, 16vw, 9rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+.ct-board-name {
+  font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+  font-weight: 700;
+}
+
+.ct-board-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.4rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ct-board-list li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 14px;
+  background: var(--ct-page);
+  font-weight: 800;
+  font-size: 1.2rem;
+}
+
+.ct-board-list small {
+  font-weight: 500;
+  color: var(--ct-muted);
+}
+
+/* ---------- phase 4: prescriptions ---------- */
+.ct-rx-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 0.9rem;
+}
+
+.ct-rx-card .ct-card-title {
+  font-size: 1rem;
+}
+
+/* ---------- phase 4: public QR verification ---------- */
+.ct-verify {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  background: var(--ct-page);
+}
+
+.ct-verify-card {
+  width: min(560px, 100%);
+  overflow: hidden;
+}
+
+.ct-verify-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 1.1rem 1.5rem;
+  background: linear-gradient(150deg, var(--ct-primary), #1e40af);
+  color: #fff;
+}
+
+.ct-verify-head small {
+  opacity: 0.8;
+}
+
+.ct-verify-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.ct-verify-list dt {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ct-muted);
+}
+
+.ct-verify-list dd {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+@media (max-width: 991.98px) {
+  .ct-chart-grid {
+    grid-template-columns: 1fr;
+  }
+  .ct-board-main {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .ct-queue-form {
+    grid-template-columns: 1fr;
+  }
+  .ct-queue-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .ct-queue-card {
+    flex-wrap: wrap;
+  }
+}

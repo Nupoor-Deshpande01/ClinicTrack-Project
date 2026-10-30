@@ -3,7 +3,7 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Link, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { ArrowLeft, Plus, Trash2, Save } from 'lucide-react';
+import { ArrowLeft, FileDown, Plus, Trash2, Save } from 'lucide-react';
 import { prescriptionsApi, visitsApi } from '../api';
 import { errorMessage } from '../api/client';
 import { prescriptionSchema } from '../validation/schemas';
@@ -16,6 +16,7 @@ export default function PrescriptionBuilder() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [serverError, setServerError] = useState('');
+  const [downloading, setDownloading] = useState(null);
 
   const {
     register,
@@ -58,6 +59,24 @@ export default function PrescriptionBuilder() {
       reset({ medicines: [{ name: '', dosage: '', frequency: '', durationDays: 3 }], advice: '' });
     } catch (err) {
       setServerError(errorMessage(err));
+    }
+  };
+
+  /** The PDF needs the JWT, so it is fetched as a blob and saved locally. */
+  const downloadPdf = async rx => {
+    setDownloading(rx.id);
+    try {
+      const blob = await prescriptionsApi.pdf(rx.id);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `prescription-${rx.id}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      toast.error(errorMessage(err));
+    } finally {
+      setDownloading(null);
     }
   };
 
@@ -203,9 +222,20 @@ export default function PrescriptionBuilder() {
           <div className="d-flex flex-column gap-2">
             {existing.map(rx => (
               <div key={rx.id} className="ct-alert ct-alert-info mb-0">
-                <div className="fw-semibold small">
-                  {new Date(rx.createdAt).toLocaleString('en-IN')} · {rx.medicines.length}{' '}
-                  medicine(s)
+                <div className="d-flex justify-content-between align-items-start gap-2">
+                  <div className="fw-semibold small">
+                    {new Date(rx.createdAt).toLocaleString('en-IN')} · {rx.medicines.length}{' '}
+                    medicine(s)
+                  </div>
+                  <button
+                    type="button"
+                    className="btn btn-ct-outline ct-btn btn-sm"
+                    onClick={() => downloadPdf(rx)}
+                    disabled={downloading === rx.id}
+                  >
+                    <FileDown size={14} aria-hidden="true" />
+                    {downloading === rx.id ? 'Preparing…' : 'PDF'}
+                  </button>
                 </div>
                 <ul className="mb-0 mt-1 small">
                   {rx.medicines.map(m => (

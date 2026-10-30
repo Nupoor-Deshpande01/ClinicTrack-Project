@@ -43,6 +43,7 @@ const prescriptionSchema = new mongoose.Schema(
     toJSON: {
       transform: (doc, ret) => {
         delete ret.__v;
+        ret.id = ret._id.toString(); // clients use plain `id` (PDF links, keys)
         return ret;
       },
     },

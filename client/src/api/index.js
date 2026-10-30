@@ -27,6 +27,11 @@ export const visitsApi = {
 export const prescriptionsApi = {
   listForVisit: visitId => api.get(`/visits/${visitId}/prescriptions`).then(r => r.data.data),
   create: (visitId, body) => api.post(`/visits/${visitId}/prescription`, body).then(r => r.data),
+  recent: () => api.get('/prescriptions').then(r => r.data.data),
+  /** PDF arrives as bytes; the caller turns it into a download. */
+  pdf: id => api.get(`/prescriptions/${id}/pdf`, { responseType: 'blob' }).then(r => r.data),
+  /** Public endpoint: works without a session (the QR-scan page). */
+  verify: qrToken => api.get(`/prescriptions/verify/${qrToken}`).then(r => r.data.data),
 };
 
 export const appointmentsApi = {
@@ -43,4 +48,21 @@ export const analyticsApi = {
 export const usersApi = {
   list: role => api.get('/users', { params: role ? { role } : {} }).then(r => r.data.data),
   create: body => api.post('/users', body).then(r => r.data),
+};
+
+export const queueApi = {
+  today: () => api.get('/queue').then(r => r.data),
+  add: body => api.post('/queue', body).then(r => r.data),
+  setStatus: (id, status) => api.patch(`/queue/${id}`, { status }).then(r => r.data),
+};
+
+export const auditApi = {
+  list: params => api.get('/audit', { params }).then(r => r.data),
+  verify: () => api.get('/audit/verify').then(r => r.data),
+};
+
+export const exportApi = {
+  /** Admin-only downloads; both come back as file streams (blobs). */
+  backup: () => api.get('/export/backup', { responseType: 'blob' }).then(r => r.data),
+  patientsCsv: () => api.get('/export/patients.csv', { responseType: 'blob' }).then(r => r.data),
 };

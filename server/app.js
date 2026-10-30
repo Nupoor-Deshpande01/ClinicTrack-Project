@@ -26,6 +26,9 @@ const prescriptionRoutes = require('./routes/prescription.routes');
 const appointmentRoutes = require('./routes/appointment.routes');
 const analyticsRoutes = require('./routes/analytics.routes');
 const userRoutes = require('./routes/user.routes');
+const queueRoutes = require('./routes/queue.routes');
+const auditRoutes = require('./routes/audit.routes');
+const exportRoutes = require('./routes/export.routes');
 const { centralErrorHandler } = require('./middleware/error');
 const { isDBConnected } = require('./config/db');
 
@@ -79,10 +82,14 @@ function createApp() {
   app.use('/api/auth', authRoutes);
   app.use('/api/patients', patientRoutes);
   app.use('/api/visits', visitRoutes);
-  app.use('/api/visits', prescriptionRoutes); // Phase 3: POST/GET prescription by visit
+  app.use('/api/visits', prescriptionRoutes); // POST/GET prescription by visit
+  app.use('/api/prescriptions', prescriptionRoutes.prescriptions); // PDF + public QR verify
   app.use('/api/appointments', appointmentRoutes);
   app.use('/api/analytics', analyticsRoutes);
   app.use('/api/users', userRoutes);
+  app.use('/api/queue', queueRoutes);
+  app.use('/api/audit', auditRoutes);
+  app.use('/api/export', exportRoutes);
 
   // ---- unknown route + central error handler (ALWAYS last) ----
   app.use((req, res) => {

@@ -342,10 +342,16 @@ async function main() {
 
     // Negative test: editing ONE historical entry must break the chain.
     const tampered = entries[entries.length - 1];
+    const originalDetails = tampered.details;
     tampered.details = { ...tampered.details, tampered: true };
     await tampered.save();
     const recompute = computeHash(tampered.prevHash, auditPayload(tampered));
     check('audit: chain detects tampering', recompute !== tampered.hash);
+    // Undo the edit so later checks (and the live chain) stay intact.
+    await tampered.constructor.collection.updateOne(
+      { _id: tampered._id },
+      { $set: { details: originalDetails } }
+    );
     check(
       'audit: never stores plaintext or hash of password',
       entries.every(
@@ -458,7 +464,169 @@ async function main() {
     });
     check('role rule: staff cannot read prescriptions → 403', rxStaff.status === 403);
 
-    /* ---------- 7. JSON envelope + unknown route ---------- */
+    /* ---------- 7. prescription PDF + public QR verification ---------- */
+    const pdfRes = await fetch(
+      `http://localhost:${port}/api/prescriptions/${rx.json.data._id}/pdf`,
+      {
+        headers: { Authorization: `Bearer ${docTok}` },
+      }
+    );
+    const pdfBytes = Buffer.from(await pdfRes.arrayBuffer());
+    check(
+      'pdf: streams a real PDF',
+      pdfRes.status === 200 &&
+        pdfRes.headers.get('content-type') === 'application/pdf' &&
+        pdfBytes.subarray(0, 5).toString() === '%PDF-',
+      `status ${pdfRes.status}, ${pdfBytes.length} bytes`
+    );
+
+    const verifyPublic = await api(port, `/api/prescriptions/verify/${rx.json.data.qrToken}`);
+    check(
+      'qr: public verification works without a token',
+      verifyPublic.status === 200 &&
+        verifyPublic.json.data.valid === true &&
+        verifyPublic.json.data.medicines.length === 1,
+      JSON.stringify(verifyPublic.json).slice(0, 120)
+    );
+    const verifyBad = await api(port, `/api/prescriptions/verify/${'0'.repeat(32)}`);
+    check('qr: unknown token → 404', verifyBad.status === 404);
+
+    /* ---------- 8. live queue ---------- */
+    const queue = await api(port, '/api/queue', { token: docTok });
+    check(
+      'queue: seeded tokens for today',
+      queue.status === 200 && queue.json.data.length === 6 && queue.json.stats.waiting >= 1,
+      JSON.stringify(queue.json.stats)
+    );
+
+    const added = await api(port, '/api/queue', {
+      method: 'POST',
+      token: staffTok,
+      body: { patientId: pid, note: 'Walk-in' },
+    });
+    check(
+      'queue: staff issues token 7',
+      added.status === 201 && added.json.data.length === 7 && added.json.stats.active >= 1,
+      JSON.stringify(added.json).slice(0, 120)
+    );
+
+    const waiting = added.json.data.find(t => t.status === 'waiting');
+    const called = await api(port, `/api/queue/${waiting.id}`, {
+      method: 'PATCH',
+      token: docTok,
+      body: { status: 'serving' },
+    });
+    check(
+      'queue: token moves to serving',
+      called.status === 200 && called.json.stats.serving >= 1,
+      JSON.stringify(called.json.stats)
+    );
+    const badStatus = await api(port, `/api/queue/${waiting.id}`, {
+      method: 'PATCH',
+      token: docTok,
+      body: { status: 'nonsense' },
+    });
+    check('queue: invalid status → 422', badStatus.status === 422);
+
+    /* ---------- 9. audit log + integrity ---------- */
+    const auditList = await api(port, '/api/audit?limit=5', { token: docTok });
+    check(
+      'audit: list returns hashed entries',
+      auditList.status === 200 &&
+        auditList.json.data.length === 5 &&
+        auditList.json.data[0].hash.length === 64,
+      JSON.stringify(auditList.json.meta)
+    );
+    check(
+      'role rule: staff cannot read the audit log → 403',
+      (await api(port, '/api/audit', { token: staffTok })).status === 403
+    );
+
+    const verifyOk = await api(port, '/api/audit/verify', { token: docTok });
+    check(
+      'audit: chain verifies end-to-end',
+      verifyOk.status === 200 &&
+        verifyOk.json.data.valid === true &&
+        verifyOk.json.data.checked > 0,
+      JSON.stringify(verifyOk.json.data)
+    );
+
+    // Simulate a tamperer editing a historical entry, then re-verify.
+    const AuditModel = require('../models/auditLog.model');
+    const victim = await AuditModel.findOne({ action: 'PATIENT_CREATED' });
+    await AuditModel.collection.updateOne(
+      { _id: victim._id },
+      { $set: { details: { mrn: 'TAMPERED', name: 'Tampered Entry' } } }
+    );
+    const verifyBroken = await api(port, '/api/audit/verify', { token: docTok });
+    check(
+      'audit: tampering is detected at the right entry',
+      verifyBroken.json.data.valid === false &&
+        verifyBroken.json.data.firstBroken.action === 'PATIENT_CREATED',
+      JSON.stringify(verifyBroken.json.data).slice(0, 160)
+    );
+
+    /* ---------- 10. analytics for the reports screen ---------- */
+    const reports = await api(port, '/api/analytics/summary', { token: docTok });
+    const reportsData = reports.json.data || {};
+    check(
+      'analytics: 14-day trend + diagnoses + peak hours',
+      reports.status === 200 &&
+        reportsData.visitTrend?.length === 14 &&
+        reportsData.topDiagnoses?.length > 0 &&
+        reportsData.peakHours?.length > 0 &&
+        reportsData.newVsReturning?.length === 2,
+      JSON.stringify(reportsData.visitTrend?.slice(0, 2))
+    );
+
+    /* ---------- 11. exports (fs + stream) ---------- */
+    const adminTok = (
+      await api(port, '/api/auth/login', {
+        method: 'POST',
+        body: { email: 'admin@clinic.test', password: 'Admin@123' },
+      })
+    ).json.token;
+
+    const backupRes = await fetch(`http://localhost:${port}/api/export/backup`, {
+      headers: { Authorization: `Bearer ${adminTok}` },
+    });
+    const backup = await backupRes.json();
+    check(
+      'export: admin JSON backup streams',
+      backupRes.status === 200 &&
+        backupRes.headers.get('content-disposition')?.includes('clinictrack-backup') &&
+        backup.counts.patients >= 30 &&
+        backup.data.users.every(u => u.password === undefined),
+      `patients=${backup.counts?.patients}`
+    );
+
+    const csvRes = await fetch(`http://localhost:${port}/api/export/patients.csv`, {
+      headers: { Authorization: `Bearer ${adminTok}` },
+    });
+    const csv = await csvRes.text();
+    check(
+      'export: patients CSV has a header + one row per patient',
+      csvRes.status === 200 &&
+        csv.split('\r\n').length === backup.counts.patients + 1 &&
+        csv.startsWith('"MRN"'),
+      `rows=${csv.split('\r\n').length}`
+    );
+
+    check(
+      'role rule: doctor cannot download backups → 403',
+      (await api(port, '/api/export/backup', { token: docTok })).status === 403
+    );
+
+    /* ---------- 12. nightly cron job ---------- */
+    const nightly = await require('../services/jobs.service').runNightly();
+    check(
+      'cron: nightly maintenance reports what it touched',
+      typeof nightly.appointmentsCancelled === 'number' &&
+        typeof nightly.queueTokensClosed === 'number',
+      JSON.stringify(nightly)
+    );
+
+    /* ---------- 13. JSON envelope + unknown route ---------- */
     const unknown = await api(port, '/api/nonsense', { token: docTok });
     check(
       'unknown route → 404 envelope',

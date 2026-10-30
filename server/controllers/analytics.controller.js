@@ -1,12 +1,15 @@
 /**
- * analytics.controller.js — dashboard numbers via MongoDB aggregation.
- * Full analytics screen (top diagnoses, peak hours) is Phase 4; this endpoint
- * already covers the four stat cards + the arrival chart.
+ * analytics.controller.js — every dashboard/report number, computed by
+ * MongoDB aggregation (no counting in JavaScript): stat cards, monthly
+ * arrivals, 14-day visit trend, top diagnoses, new vs returning patients and
+ * the clinic's peak hours.
  */
 const Patient = require('../models/patient.model');
 const Visit = require('../models/visit.model');
 const Appointment = require('../models/appointment.model');
+const QueueToken = require('../models/queueToken.model');
 const User = require('../models/user.model');
+const { dayKey } = require('./queue.controller');
 
 /** GET /api/analytics/summary?months=6 */
 async function summary(req, res) {
@@ -22,8 +25,7 @@ async function summary(req, res) {
       scheduledAt: { $gte: startOfToday, $lte: endOfToday },
       status: 'scheduled',
     }),
-    // Live queue arrives in Phase 4; reporting 0 now is honest, not broken UI.
-    Promise.resolve(0),
+    QueueToken.countDocuments({ dayKey: dayKey(), status: { $in: ['waiting', 'serving'] } }),
   ]);
 
   // Pending follow-ups: patients whose most recent current visit is older
@@ -85,6 +87,60 @@ async function summary(req, res) {
     .select('name specialty')
     .limit(6);
 
+  // ---- analytics screen aggregations ----
+  const last14 = new Date(startOfToday.getTime() - 13 * 86400000);
+  // Local clinic hours, not UTC: the server and clinic share a timezone.
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const [visitsByDay, topDiagnoses, returningSplit, peakHours] = await Promise.all([
+    Visit.aggregate([
+      { $match: { visitDate: { $gte: last14 } } },
+      {
+        $group: {
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$visitDate' } },
+          count: { $sum: 1 },
+        },
+      },
+    ]),
+    Visit.aggregate([
+      { $match: { isCurrent: true } },
+      { $group: { _id: '$diagnosis', count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+      { $limit: 5 },
+    ]),
+    // Patients with exactly one current visit are "new", the rest "returning".
+    Visit.aggregate([
+      { $match: { isCurrent: true } },
+      { $group: { _id: '$patientId', visits: { $sum: 1 } } },
+      {
+        $group: {
+          _id: { $cond: [{ $gt: ['$visits', 1] }, 'returning', 'new'] },
+          count: { $sum: 1 },
+        },
+      },
+    ]),
+    Visit.aggregate([
+      { $match: { visitDate: { $gte: last14 } } },
+      { $group: { _id: { $hour: { date: '$visitDate', timezone } }, count: { $sum: 1 } } },
+      { $sort: { _id: 1 } },
+    ]),
+  ]);
+
+  // Fill the 14-day trend so quiet days show as zero instead of gaps.
+  const dayMap = new Map(visitsByDay.map(d => [d._id, d.count]));
+  const visitTrend = Array.from({ length: 14 }, (_, i) => {
+    const d = new Date(last14.getTime() + i * 86400000);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
+      d.getDate()
+    ).padStart(2, '0')}`;
+    return {
+      date: key,
+      label: d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }),
+      count: dayMap.get(key) || 0,
+    };
+  });
+
+  const split = Object.fromEntries(returningSplit.map(r => [r._id, r.count]));
+
   res.json({
     success: true,
     data: {
@@ -94,6 +150,16 @@ async function summary(req, res) {
         id: d._id,
         name: d.name,
         specialty: d.specialty || 'General Medicine',
+      })),
+      visitTrend,
+      topDiagnoses: topDiagnoses.map(d => ({ diagnosis: d._id, count: d.count })),
+      newVsReturning: [
+        { name: 'New patients', value: split.new || 0 },
+        { name: 'Returning patients', value: split.returning || 0 },
+      ],
+      peakHours: peakHours.map(h => ({
+        hour: `${String(h._id).padStart(2, '0')}:00`,
+        count: h.count,
       })),
     },
   });

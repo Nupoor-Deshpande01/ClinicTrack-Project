@@ -73,6 +73,19 @@ cd client && npm run dev          # in a second terminal
 
 `dev:memory` is a demo helper only — data disappears when the process stops.
 
+### Phase 4 demo screens
+
+| URL                | What it shows                                               |
+| ------------------ | ----------------------------------------------------------- |
+| `/queue`           | Live waiting-room queue; issue tokens, call/done/skip       |
+| `/queue/board`     | Full-screen "Now Serving" board for a second display        |
+| `/prescriptions`   | Recent prescriptions; download the PDF, open the QR page    |
+| `/verify/:qrToken` | Public QR page — no login needed                            |
+| `/analytics`       | Visits per day, peak hours, top diagnoses, new vs returning |
+| `/audit`           | Hash-chained trail + **Verify integrity**                   |
+
+Socket.IO shares the API port; the Vite dev proxy forwards `/socket.io`.
+
 ## Demo logins _(set by the seed script)_
 
 | Role              | Email                | Password     |
@@ -93,11 +106,12 @@ cd client && npm run dev          # in a second terminal
 - [x] Visit form + validation errors
 - [x] Visit timeline with versions
 - [x] Side-by-side diff with red/green highlighting
-- [ ] Prescription builder + PDF
-- [ ] Admin users + appointments pages
-- [ ] Live queue board
-- [ ] Analytics screen
-- [ ] Audit log + "Verify Integrity" pass/fail states
+- [x] Prescription builder + PDF
+- [x] Admin users + appointments pages
+- [x] Live queue board
+- [x] Analytics screen
+- [x] Audit log + "Verify Integrity" pass/fail states
+- [x] Public QR verification page
 - [x] Dark mode + mobile layout
 
 ## Modules in progress
@@ -108,6 +122,8 @@ cd client && npm run dev          # in a second terminal
 - **Phase 3 (done):** React app — theme + dark mode, sidebar/topbar shell, JWT auth + role guards,
   dashboard, patients (list/register/profile), visit form, timeline, diff viewer, prescription
   builder, appointments and admin users screens.
-- **Phase 4:** wow features (audit chain, allergy alerts, PDF+QR, live queue, analytics).
+- **Phase 4 (done):** wow features — Git-style timeline/diff/rollback and the allergy alert (shipped
+  in Phase 3), tamper-evident audit log with _Verify integrity_, PDF prescription with QR +
+  public verification page, Socket.IO live queue and Now Serving board, analytics reports
+  (visits per day, top diagnoses, new vs returning, peak hours), and streamed JSON/CSV exports.
 - **Phase 5:** polish, API.md, Postman collection, deployment notes.
-# ClinicTrack-Project

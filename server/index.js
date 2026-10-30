@@ -1,8 +1,10 @@
 /**
- * index.js — entry point: check env, connect MongoDB, start listening.
+ * index.js — entry point: check env, connect MongoDB, start HTTP + Socket.IO.
  */
 const { connectDB } = require('./config/db');
 const createApp = require('./app');
+const { attach, listen } = require('./services/realtime.service');
+const { startJobs } = require('./services/jobs.service');
 
 async function main() {
   if (!process.env.JWT_SECRET) {
@@ -23,12 +25,14 @@ async function main() {
   }
 
   const app = createApp();
+  attach(app); // HTTP server + Socket.IO (queue:update broadcasts)
   const port = process.env.PORT || 5000;
-  app.listen(port, () => {
-    console.log(
-      `ClinicTrack API listening on http://localhost:${port} (db: ${dbReady ? 'connected' : 'down'})`
-    );
-  });
+  await listen(port);
+  console.log(
+    `ClinicTrack API listening on http://localhost:${port} (db: ${dbReady ? 'connected' : 'down'})`
+  );
+
+  startJobs(); // nightly appointment/queue maintenance (node-cron)
 }
 
 main();

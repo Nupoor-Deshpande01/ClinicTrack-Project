@@ -11,6 +11,7 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 const { connectDB } = require('../config/db');
 const { runSeed } = require('../seed/seed');
 const createApp = require('../app');
+const { attach, listen } = require('../services/realtime.service');
 
 (async () => {
   const memory = await MongoMemoryServer.create();
@@ -20,10 +21,10 @@ const createApp = require('../app');
     'Demo accounts: doctor@clinic.test / Doctor@123 · staff@clinic.test / Staff@123 · admin@clinic.test / Admin@123'
   );
 
+  attach(createApp()); // HTTP server + Socket.IO for the live queue
   const port = process.env.PORT || 5000;
-  createApp().listen(port, () =>
-    console.log(`ClinicTrack API (in-memory DB) on http://localhost:${port}`)
-  );
+  await listen(port);
+  console.log(`ClinicTrack API (in-memory DB) on http://localhost:${port}`);
 
   const stop = async () => {
     await memory.stop();

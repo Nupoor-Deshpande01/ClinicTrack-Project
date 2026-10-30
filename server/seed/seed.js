@@ -16,6 +16,8 @@ const Patient = require('../models/patient.model');
 const Visit = require('../models/visit.model');
 const AuditLog = require('../models/auditLog.model');
 const Appointment = require('../models/appointment.model');
+const Prescription = require('../models/prescription.model');
+const QueueToken = require('../models/queueToken.model');
 
 const FIRST = [
   'Aarav',
@@ -104,6 +106,8 @@ async function runSeed(opts = {}) {
     Visit.deleteMany({}),
     AuditLog.deleteMany({}),
     Appointment.deleteMany({}),
+    Prescription.deleteMany({}),
+    QueueToken.deleteMany({}),
   ]);
 
   const users = await User.create([
@@ -152,10 +156,15 @@ async function runSeed(opts = {}) {
       // visits today and a realistic handful of overdue follow-ups.
       const daysAgo = (i % 7) * 5 + k * 20;
       const btn = DIAGNOSES[(i + k) % DIAGNOSES.length];
+      // Clinic hours 09:00-16:00 so the peak-hours chart has a real shape.
+      const visitDate = new Date();
+      visitDate.setDate(visitDate.getDate() - daysAgo);
+      visitDate.setHours(9 + ((i + k) % 8), (i * 13) % 60, 0, 0);
+      if (visitDate > new Date()) visitDate.setTime(Date.now() - (k + 1) * 20 * 60 * 1000);
       const v = await Visit.create({
         patientId: patient._id,
         doctorId: patient.primaryDoctorId,
-        visitDate: new Date(Date.now() - daysAgo * 24 * 3600 * 1000),
+        visitDate,
         diagnosis: btn.diagnosis,
         symptoms: btn.symptoms,
         notes: NOTES_SNIPPET,
@@ -235,11 +244,61 @@ async function runSeed(opts = {}) {
   }
   await Appointment.create(appointmentDocs);
 
+  // ---- prescriptions on the current visit of a few patients (PDF + QR demo) ----
+  // One prescription per patient (no duplicate cards) so the list reads cleanly.
+  const rxVisits = [];
+  const seenPatient = new Set();
+  for (const v of visitsMade) {
+    const key = String(v.patientId);
+    if (!v.isCurrent || seenPatient.has(key)) continue;
+    seenPatient.add(key);
+    rxVisits.push(v);
+    if (rxVisits.length === 5) break;
+  }
+  const prescriptionDocs = await Prescription.create(
+    rxVisits.map((v, i) => ({
+      visitId: v._id,
+      patientId: v.patientId,
+      doctorId: v.doctorId,
+      medicines: [
+        { name: 'Paracetamol', dosage: '500 mg', frequency: '1-0-1', durationDays: 3 },
+        {
+          name: i % 2 ? 'Cetirizine' : 'Amoxicillin',
+          dosage: i % 2 ? '10 mg' : '250 mg',
+          frequency: '0-0-1',
+          durationDays: 5,
+        },
+      ],
+      advice: 'Plenty of fluids, light meals and rest. Return if fever crosses 102°F.',
+    }))
+  );
+
+  // ---- today's waiting-room queue (Live Queue demo) ----
+  const today0 = new Date();
+  const pad2 = n => String(n).padStart(2, '0');
+  const todayKey = `${today0.getFullYear()}-${pad2(today0.getMonth() + 1)}-${pad2(today0.getDate())}`;
+  const queueStatuses = ['done', 'done', 'serving', 'waiting', 'waiting', 'waiting'];
+  await QueueToken.create(
+    queueStatuses.map((status, i) => ({
+      dayKey: todayKey,
+      tokenNumber: i + 1,
+      patientId: patientDocs[i]._id,
+      doctorId: patientDocs[i].primaryDoctorId,
+      status,
+      note: i === 2 ? 'Follow-up after lab report' : undefined,
+      calledAt: status === 'done' || status === 'serving' ? new Date() : undefined,
+      completedAt: status === 'done' ? new Date() : undefined,
+      createdBy: users[2]._id,
+    }))
+  );
+
   const summary = {
     users: users.length,
     patients: patientDocs.length,
     visits: visitsMade.length,
     appointments: appointmentDocs.length,
+    prescriptions: prescriptionDocs.length,
+    queueTokens: queueStatuses.length,
   };
   console.log('Seed complete:', JSON.stringify(summary));
 

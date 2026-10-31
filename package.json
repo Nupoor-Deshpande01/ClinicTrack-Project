@@ -18,8 +18,10 @@
     "setup": "npm install",
     "seed": "npm run seed --workspace server",
     "dev:server": "npm run dev --workspace server",
+    "dev:memory": "npm run dev:memory --workspace server",
     "dev:client": "npm run dev --workspace client",
-    "build:client": "npm run build --workspace client"
+    "build:client": "npm run build --workspace client",
+    "build": "npm run build --workspace client"
   },
   "devDependencies": {
     "@eslint/js": "^9.14.0",

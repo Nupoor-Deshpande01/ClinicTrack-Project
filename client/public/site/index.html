@@ -1,0 +1,769 @@
+<!doctype html>
+<html lang="en" data-bs-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Siddhivinayak Clinic — Empowering Lives through Transformative Healthcare</title>
+    <meta
+      name="description"
+      content="Siddhivinayak Clinic: primary care, specialized services, diagnostics and rehabilitation. Book an appointment online."
+    />
+
+    <!-- Bootstrap 5 + Icons + font (CDN; see docs/TOMCAT_SETUP.md for offline option) -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <link rel="stylesheet" href="css/theme.css" />
+    <link rel="stylesheet" href="css/site.css" />
+  </head>
+  <body>
+    <!-- ===================== NAVBAR ===================== -->
+    <nav class="navbar navbar-expand-lg sticky-top ct-navbar">
+      <div class="container">
+        <a class="navbar-brand d-flex align-items-center gap-2" href="#hero">
+          <span class="ct-logo"><i class="bi bi-heart-pulse-fill" aria-hidden="true"></i></span>
+          <span class="fw-bold">Siddhivinayak Clinic</span>
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#mainNav"
+          aria-controls="mainNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+          <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-lg-2">
+            <li class="nav-item"><a class="nav-link active" href="#hero">Home</a></li>
+            <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
+            <li class="nav-item"><a class="nav-link" href="#doctors">Doctors</a></li>
+            <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+          </ul>
+          <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-sm btn-ct-outline ct-btn" data-theme-toggle>
+              <i class="bi bi-sun-fill ct-theme-icon" aria-hidden="true"></i>
+              <span class="ct-theme-label d-none d-lg-inline">Light</span>
+            </button>
+            <a href="/login" class="btn btn-sm btn-ct-outline ct-btn">Staff Login</a>
+            <a href="#appointment" class="btn btn-ct-primary ct-btn">Make Appointment</a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ===================== HERO ===================== -->
+    <header id="hero" class="ct-hero py-5">
+      <div class="container">
+        <div class="row align-items-center g-5">
+          <div class="col-lg-6">
+            <span class="ct-label">Siddhivinayak Clinic, Pune</span>
+            <h1>Empowering Lives through Transformative Healthcare</h1>
+            <p class="ct-text-muted my-3 pe-lg-5">
+              Our mission is to empower lives, fostering wellness through innovative healthcare,
+              cutting-edge technology, and a dedicated team of medical professionals who treat every
+              patient like family.
+            </p>
+            <div class="d-flex gap-2 flex-wrap">
+              <a href="#appointment" class="btn btn-ct-primary ct-btn">Make Appointment</a>
+              <button
+                type="button"
+                class="btn btn-ct-outline ct-btn"
+                id="hero-chat-btn"
+                aria-label="Open chat window"
+              >
+                <i class="bi bi-chat-dots me-1" aria-hidden="true"></i> Chat with Us
+              </button>
+            </div>
+          </div>
+          <div class="col-lg-6 text-center position-relative">
+            <img
+              src="assets/img/hero-doctor.svg"
+              alt="Doctor holding a patient clipboard"
+              class="img-fluid"
+              style="max-height: 420px"
+            />
+            <!-- floating glass chips -->
+            <span
+              class="ct-glass-chip position-absolute top-0 start-0 d-none d-md-inline-flex align-items-center gap-2"
+              style="transform: translateY(20px)"
+            >
+              <i class="bi bi-people-fill text-primary" aria-hidden="true"></i> 38+ Experienced
+              Doctors
+            </span>
+            <span
+              class="ct-glass-chip position-absolute end-0 d-none d-md-inline-flex align-items-center gap-2"
+              style="transform: translateY(90px)"
+            >
+              <i class="bi bi-award-fill text-warning" aria-hidden="true"></i> 20+ Medical
+              Achievements
+            </span>
+            <!-- featured doctor card (name switches with the hero dots) -->
+            <div class="ct-card ct-hero-doc mx-auto p-3 text-start d-flex align-items-center gap-3">
+              <span class="ct-doc-avatar" id="hero-doc-avatar" aria-hidden="true">AD</span>
+              <div class="flex-grow-1">
+                <div class="fw-bold" id="hero-doc-name">Dr. Anjali Deshmukh</div>
+                <small class="ct-text-muted" id="hero-doc-spec">Cardiologist · MBBS, MD</small>
+              </div>
+              <a href="#appointment" class="btn btn-sm btn-ct-primary ct-btn">Book</a>
+            </div>
+            <!-- hero carousel dots -->
+            <div
+              class="ct-hero-dots d-flex justify-content-center gap-2 mt-3"
+              role="group"
+              aria-label="Featured doctor selection"
+            >
+              <button type="button" class="active" aria-label="Show Dr. Anjali Deshmukh"></button>
+              <button type="button" aria-label="Show Dr. Rohan Jadhav"></button>
+              <button type="button" aria-label="Show Dr. Vikram Patil"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===================== ABOUT ===================== -->
+    <section id="about" class="py-5">
+      <div class="container">
+        <div class="d-flex align-items-center gap-3">
+          <span class="ct-label">About Us</span>
+          <hr class="flex-grow-1" />
+        </div>
+        <p class="fs-4 ct-text-muted fst-italic col-lg-10 mx-auto text-center my-3">
+          “Leading healthcare institution dedicated to providing exceptional medical services and
+          personalized care.”
+        </p>
+        <div class="row align-items-center g-5 mt-4">
+          <div class="col-lg-5">
+            <div class="ct-about-backing">
+              <img
+                src="assets/img/about-clinic.svg"
+                alt="Illustration of a doctor reviewing a patient monitor"
+                class="ct-about-img"
+              />
+            </div>
+          </div>
+          <div class="col-lg-6 offset-lg-1">
+            <h2 class="h5 fw-bold ct-label mb-3">Vision</h2>
+            <ul class="list-unstyled ct-check">
+              <li>
+                <i class="bi bi-check-circle-fill" aria-hidden="true"></i> To be the premier
+                healthcare provider, recognized for excellence in medical care, patient-centered
+                approach, and commitment to advancing healthcare services.
+              </li>
+            </ul>
+            <h2 class="h5 fw-bold ct-label mb-3">Missions</h2>
+            <ul class="list-unstyled ct-check">
+              <li>
+                <i class="bi bi-check-circle-fill" aria-hidden="true"></i> Provide exceptional and
+                comprehensive healthcare services.
+              </li>
+              <li>
+                <i class="bi bi-check-circle-fill" aria-hidden="true"></i> Prioritize
+                patient-centered care and satisfaction.
+              </li>
+              <li>
+                <i class="bi bi-check-circle-fill" aria-hidden="true"></i> Foster a culture of
+                continuous learning and innovation.
+              </li>
+              <li>
+                <i class="bi bi-check-circle-fill" aria-hidden="true"></i> Cultivate strong
+                partnerships and collaborations.
+              </li>
+            </ul>
+            <a href="#services" class="btn btn-ct-outline ct-btn mt-2"
+              >Learn More <i class="bi bi-arrow-right ms-1" aria-hidden="true"></i
+            ></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SERVICES ===================== -->
+    <section id="services" class="py-5">
+      <div class="container">
+        <div class="text-center">
+          <span class="ct-label">Our Services</span>
+          <h2 class="ct-section-title mt-2">
+            Comprehensive Healthcare Solutions for Your Well-being
+          </h2>
+        </div>
+        <div class="row g-4 mt-4">
+          <div class="col-md-6 col-lg-3">
+            <div class="ct-card ct-service-card h-100 p-4">
+              <span class="ct-service-icon mb-3"
+                ><i class="bi bi-clipboard2-pulse-fill" aria-hidden="true"></i
+              ></span>
+              <h3 class="h6 fw-bold">Primary Care</h3>
+              <p class="ct-text-muted small">
+                Routine check-ups and preventive care for overall health and wellness.
+              </p>
+              <a
+                href="#appointment"
+                class="small fw-semibold text-decoration-none"
+                style="color: var(--ct-primary)"
+                >Learn More →</a
+              >
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <div class="ct-card ct-service-card h-100 p-4">
+              <span class="ct-service-icon mb-3"
+                ><i class="bi bi-bandaid-fill" aria-hidden="true"></i
+              ></span>
+              <h3 class="h6 fw-bold">Specialized Medical Services</h3>
+              <p class="ct-text-muted small">
+                Cardiology, paediatrics, dermatology, orthopaedics and more.
+              </p>
+              <a
+                href="#appointment"
+                class="small fw-semibold text-decoration-none"
+                style="color: var(--ct-primary)"
+                >Learn More →</a
+              >
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <div class="ct-card ct-service-card h-100 p-4">
+              <span class="ct-service-icon mb-3"
+                ><i class="bi bi-box2-heart-fill" aria-hidden="true"></i
+              ></span>
+              <h3 class="h6 fw-bold">Diagnostic Imaging</h3>
+              <p class="ct-text-muted small">
+                X-ray, ultrasound and lab diagnostics with same-day reports.
+              </p>
+              <a
+                href="#appointment"
+                class="small fw-semibold text-decoration-none"
+                style="color: var(--ct-primary)"
+                >Learn More →</a
+              >
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <div class="ct-card ct-service-card h-100 p-4">
+              <span class="ct-service-icon mb-3"
+                ><i class="bi bi-activity" aria-hidden="true"></i
+              ></span>
+              <h3 class="h6 fw-bold">Rehabilitation Services</h3>
+              <p class="ct-text-muted small">
+                Physiotherapy and recovery programs to restore your mobility.
+              </p>
+              <a
+                href="#appointment"
+                class="small fw-semibold text-decoration-none"
+                style="color: var(--ct-primary)"
+                >Learn More →</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== TESTIMONIALS ===================== -->
+    <section id="testimonials" class="py-5">
+      <div class="container">
+        <div class="row g-4 align-items-stretch">
+          <div class="col-lg-4">
+            <span class="ct-label">Testimonials</span>
+            <h2 class="ct-section-title mt-2 mb-3">Our Success Stories</h2>
+            <p class="ct-text-muted small">
+              Discover inspiring narratives and period shifts shared by our patients — click a story
+              to read it here.
+            </p>
+            <div class="ct-card p-2" id="story-list" role="group" aria-label="Patient stories">
+              <!-- filled by the tiny script at the bottom of this page -->
+            </div>
+          </div>
+          <div class="col-lg-8">
+            <div class="ct-card p-3 h-100">
+              <!-- video-style card: poster + play button overlay; opens the selected story -->
+              <div
+                class="ct-video-frame position-relative d-flex align-items-center justify-content-center"
+                style="background: linear-gradient(135deg, #2563eb, #1e40af)"
+              >
+                <img
+                  src="assets/img/about-clinic.svg"
+                  alt=""
+                  aria-hidden="true"
+                  class="position-absolute opacity-50"
+                  style="inset: 0; width: 100%; height: 100%; object-fit: cover"
+                />
+                <button
+                  type="button"
+                  id="story-play"
+                  class="btn btn-light rounded-circle position-relative"
+                  style="width: 64px; height: 64px"
+                  aria-label="Play patient story"
+                >
+                  <i class="bi bi-play-fill fs-3" aria-hidden="true"></i>
+                </button>
+              </div>
+              <p class="fst-italic mt-3 mb-0" id="story-quote"></p>
+              <footer class="small ct-text-muted" id="story-author"></footer>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== DOCTORS ===================== -->
+    <section id="doctors" class="py-5">
+      <div class="container">
+        <div class="text-center">
+          <span class="ct-label">Our Doctors</span>
+          <h2 class="ct-section-title mt-2">Meet Our Exceptional Doctors</h2>
+        </div>
+        <div id="doctorCarousel" class="carousel slide mt-4" data-bs-ride="carousel">
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <div class="row g-4 justify-content-center">
+                <div class="col-md-6 col-lg-3">
+                  <div class="ct-card ct-doc-card p-3 h-100" data-doctor="0"></div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                  <div class="ct-card ct-doc-card p-3 h-100" data-doctor="1"></div>
+                </div>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <div class="row g-4 justify-content-center">
+                <div class="col-md-6 col-lg-3">
+                  <div class="ct-card ct-doc-card p-3 h-100" data-doctor="2"></div>
+                </div>
+                <div class="col-md-6 col-lg-3">
+                  <div class="ct-card ct-doc-card p-3 h-100" data-doctor="3"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <button
+            class="carousel-control-prev"
+            type="button"
+            data-bs-target="#doctorCarousel"
+            data-bs-slide="prev"
+            style="left: -3.5rem"
+          >
+            <span
+              class="carousel-control-prev-icon"
+              style="filter: invert(0.5)"
+              aria-hidden="true"
+            ></span>
+            <span class="visually-hidden">Previous</span>
+          </button>
+          <button
+            class="carousel-control-next"
+            type="button"
+            data-bs-target="#doctorCarousel"
+            data-bs-slide="next"
+            style="right: -3.5rem"
+          >
+            <span
+              class="carousel-control-next-icon"
+              style="filter: invert(0.5)"
+              aria-hidden="true"
+            ></span>
+            <span class="visually-hidden">Next</span>
+          </button>
+        </div>
+        <div class="text-center mt-4">
+          <a href="#appointment" class="btn btn-ct-primary ct-btn">Make Appointment</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== CONTACT BANNER ===================== -->
+    <section id="contact" class="py-5">
+      <div class="container">
+        <div class="ct-contact-banner p-5">
+          <div class="row align-items-center g-3">
+            <div class="col-lg-8">
+              <span class="small text-uppercase fw-semibold opacity-75">Get in Touch</span>
+              <h2 class="fw-bold mt-1">Contact Us for Exceptional Care</h2>
+              <p class="mb-0 opacity-75 small">
+                We're here to support your hospital needs and answer any questions you may have.
+              </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+              <a href="#appointment" class="btn btn-light ct-btn">Contact Us</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== APPOINTMENT FORM ===================== -->
+    <section id="appointment" class="py-5">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-lg-5">
+            <span class="ct-label">Appointment</span>
+            <h2 class="ct-section-title mt-2">Request an Appointment</h2>
+            <p class="ct-text-muted">
+              Fill this form and our reception will confirm by phone. Validation runs before
+              anything is saved — try submitting an invalid mobile number or a past date to see the
+              inline error messages.
+            </p>
+          </div>
+          <div class="col-lg-7">
+            <div class="ct-card p-4">
+              <div id="appointment-success" class="alert alert-success d-none" role="status"></div>
+              <form id="appointment-form" novalidate>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="apt-name" class="form-label fw-semibold"
+                      >Full name <span class="text-danger">*</span></label
+                    >
+                    <input
+                      type="text"
+                      id="apt-name"
+                      class="form-control"
+                      placeholder="e.g. Ravi Kulkarni"
+                      autocomplete="name"
+                      required
+                    />
+                    <span id="apt-name-error" class="ct-error" hidden></span>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="apt-phone" class="form-label fw-semibold"
+                      >Mobile number <span class="text-danger">*</span></label
+                    >
+                    <input
+                      type="tel"
+                      id="apt-phone"
+                      class="form-control"
+                      placeholder="10 digits, starts with 6-9"
+                      autocomplete="tel"
+                      required
+                    />
+                    <span id="apt-phone-error" class="ct-error" hidden></span>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="apt-service" class="form-label fw-semibold"
+                      >Service <span class="text-danger">*</span></label
+                    >
+                    <select id="apt-service" class="form-select" required>
+                      <option value="">Select a service…</option>
+                      <option>General Checkup</option>
+                      <option>Primary Care</option>
+                      <option>Cardiology</option>
+                      <option>Paediatrics</option>
+                      <option>Dermatology</option>
+                      <option>Orthopaedics</option>
+                      <option>Diagnostic Imaging</option>
+                      <option>Rehabilitation</option>
+                    </select>
+                    <span id="apt-service-error" class="ct-error" hidden></span>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="apt-date" class="form-label fw-semibold"
+                      >Preferred date <span class="text-danger">*</span></label
+                    >
+                    <input type="date" id="apt-date" class="form-control" required />
+                    <span id="apt-date-error" class="ct-error" hidden></span>
+                  </div>
+                  <div class="col-12">
+                    <label for="apt-notes" class="form-label fw-semibold">Notes (optional)</label>
+                    <textarea
+                      id="apt-notes"
+                      class="form-control"
+                      rows="2"
+                      placeholder="Preferred time slot, symptoms…"
+                    ></textarea>
+                  </div>
+                  <div class="col-12 d-flex gap-2">
+                    <button
+                      type="submit"
+                      id="appointment-submit-btn"
+                      class="btn btn-ct-primary ct-btn"
+                    >
+                      Request Appointment
+                    </button>
+                    <button
+                      type="button"
+                      id="appointment-cancel-btn"
+                      class="btn btn-ct-outline ct-btn d-none"
+                    >
+                      Cancel edit
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Saved requests table (backed by the in-memory JSON array) -->
+        <div class="ct-card p-4 mt-4">
+          <h3 class="h6 fw-bold mb-3">
+            <i class="bi bi-list-ul me-2" aria-hidden="true"></i>Saved appointment requests
+            <span class="ct-text-muted fw-normal">(in-memory demo store)</span>
+          </h3>
+          <div class="table-responsive">
+            <table class="table ct-table align-middle mb-0">
+              <thead class="small text-uppercase ct-text-muted">
+                <tr>
+                  <th scope="col">Name</th>
+                  <th scope="col">Phone</th>
+                  <th scope="col">Service</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="appointment-table-body"></tbody>
+            </table>
+            <p id="appointment-empty" class="ct-text-muted small mb-0 d-none">
+              No appointment requests yet — add one with the form above.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer class="ct-footer py-5">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-lg-4">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <span class="ct-logo"><i class="bi bi-heart-pulse-fill" aria-hidden="true"></i></span>
+              <span class="fw-bold">Siddhivinayak Clinic</span>
+            </div>
+            <h3 class="small text-uppercase fw-bold ct-text-muted mt-3">Location</h3>
+            <p class="small ct-text-muted mb-1">
+              Shivaji Chowk, Pimpri-Chinchwad,<br />Pune, Maharashtra 411018
+            </p>
+            <p class="small ct-text-muted mb-0">+91 98765 43210</p>
+            <div class="d-flex gap-3 fs-5 mt-3" style="color: var(--ct-primary)">
+              <a href="#" class="text-decoration-none" aria-label="Facebook"
+                ><i class="bi bi-facebook" aria-hidden="true"></i
+              ></a>
+              <a href="#" class="text-decoration-none" aria-label="Instagram"
+                ><i class="bi bi-instagram" aria-hidden="true"></i
+              ></a>
+              <a href="#" class="text-decoration-none" aria-label="YouTube"
+                ><i class="bi bi-youtube" aria-hidden="true"></i
+              ></a>
+            </div>
+          </div>
+          <div class="col-lg-2 col-6">
+            <h3 class="small text-uppercase fw-bold ct-text-muted">Links</h3>
+            <ul class="list-unstyled small">
+              <li>
+                <a class="text-decoration-none ct-text-muted" href="#appointment"
+                  >Make Appointment</a
+                >
+              </li>
+              <li><a class="text-decoration-none ct-text-muted" href="#services">Services</a></li>
+              <li>
+                <a class="text-decoration-none ct-text-muted" href="tools.html">Patient Tools</a>
+              </li>
+              <li><a class="text-decoration-none ct-text-muted" href="#about">About Us</a></li>
+            </ul>
+          </div>
+          <div class="col-lg-2 col-6">
+            <h3 class="small text-uppercase fw-bold ct-text-muted">Menu</h3>
+            <ul class="list-unstyled small">
+              <li><a class="text-decoration-none ct-text-muted" href="#hero">Home</a></li>
+              <li><a class="text-decoration-none ct-text-muted" href="#doctors">Doctors</a></li>
+              <li>
+                <a class="text-decoration-none ct-text-muted" href="#testimonials">Testimonials</a>
+              </li>
+              <li><a class="text-decoration-none ct-text-muted" href="#contact">Contact</a></li>
+            </ul>
+          </div>
+          <div class="col-lg-4">
+            <h3 class="small text-uppercase fw-bold ct-text-muted">Treatments</h3>
+            <ul class="list-unstyled small ct-text-muted mb-0">
+              <li>General Consultation</li>
+              <li>Cardiac Screening</li>
+              <li>Child Vaccination</li>
+              <li>Skin & Laser Care</li>
+              <li>Physiotherapy</li>
+            </ul>
+          </div>
+        </div>
+        <hr class="mt-4" />
+        <p class="small ct-text-muted mb-0 text-center">
+          © 2026 Siddhivinayak Clinic · Dummy demo site for Web Technology (2310362L) — MIT Academy
+          of Engineering.
+        </p>
+      </div>
+    </footer>
+
+    <!-- ===================== CHAT WIDGET ===================== -->
+    <button
+      type="button"
+      id="chat-toggle"
+      class="ct-chat-toggle"
+      aria-label="Chat with us (Ctrl+K)"
+    >
+      <i class="bi bi-chat-dots-fill" aria-hidden="true"></i>
+    </button>
+    <section
+      id="chat-panel"
+      class="ct-chat-panel ct-card d-none"
+      aria-label="Clinic chat assistant"
+    >
+      <div
+        class="d-flex align-items-center justify-content-between p-3 border-bottom"
+        style="border-color: var(--ct-border) !important"
+      >
+        <div class="d-flex align-items-center gap-2">
+          <span class="ct-logo" aria-hidden="true"><i class="bi bi-robot"></i></span>
+          <div>
+            <div class="fw-bold small">Siddhivinayak Assistant</div>
+            <div class="small ct-success" style="color: var(--ct-success)">
+              ● Rule-based demo bot
+            </div>
+          </div>
+        </div>
+        <button type="button" id="chat-close" class="btn btn-sm" aria-label="Close chat">
+          <i class="bi bi-x-lg" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div id="chat-body" class="ct-chat-body"></div>
+      <div class="p-3 border-top d-flex gap-2" style="border-color: var(--ct-border) !important">
+        <label class="visually-hidden" for="chat-input">Message</label>
+        <input
+          type="text"
+          id="chat-input"
+          class="form-control"
+          placeholder="Ask about timings, services…"
+        />
+        <button
+          type="button"
+          id="chat-send"
+          class="btn btn-ct-primary ct-btn"
+          aria-label="Send message"
+        >
+          <i class="bi bi-send" aria-hidden="true"></i>
+        </button>
+      </div>
+    </section>
+
+    <!-- ===================== SCRIPTS ===================== -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/clinic-utils.js"></script>
+    <script src="js/site-theme.js"></script>
+    <script src="js/demo-seed.js"></script>
+    <script src="js/appointment.js"></script>
+    <script src="js/chat-data.js"></script>
+    <script src="js/chat.js"></script>
+    <script>
+      /**
+       * Page-specific tiny widgets: hero doctor dots, testimonial stories and
+       * doctor cards. Data kept as JSON arrays to demo "JSON + arrays" usage.
+       */
+      (function () {
+        'use strict';
+
+        const DOCTORS = [
+          { name: 'Dr. Anjali Deshmukh', spec: 'Cardiologist', qual: 'MBBS, MD (Cardiology)' },
+          { name: 'Dr. Rohan Jadhav', spec: 'Paediatrics', qual: 'MBBS, DCH' },
+          { name: 'Dr. Meera Kulkarni', spec: 'Dermatologist', qual: 'MBBS, MD (Dermatology)' },
+          { name: 'Dr. Vikram Patil', spec: 'Orthopaedics', qual: 'MBBS, MS (Ortho)' },
+        ];
+
+        // Hero doctor card + dots
+        const dots = document.querySelectorAll('.ct-hero-dots button');
+        dots.forEach((dot, i) => {
+          dot.addEventListener('click', function () {
+            dots.forEach(d => d.classList.remove('active'));
+            dot.classList.add('active');
+            document.getElementById('hero-doc-name').textContent = DOCTORS[i].name;
+            document.getElementById('hero-doc-spec').textContent =
+              `${DOCTORS[i].spec} · ${DOCTORS[i].qual}`;
+            document.getElementById('hero-doc-avatar').textContent = DOCTORS[i].name
+              .replace('Dr. ', '')
+              .split(' ')
+              .map(w => w[0])
+              .join('');
+          });
+        });
+
+        // Doctor cards in the carousel
+        document.querySelectorAll('.ct-doc-card').forEach((card, i) => {
+          const d = DOCTORS[i];
+          const initials = d.name
+            .replace('Dr. ', '')
+            .split(' ')
+            .map(w => w[0])
+            .join('');
+          card.innerHTML = `
+          <div class="rounded-3 p-4 text-center mb-3" style="background: linear-gradient(135deg, var(--ct-primary-light), var(--ct-primary)); color: var(--ct-primary)">
+            <span class="display-5 fw-bold">${initials}</span>
+          </div>
+          <h3 class="h6 fw-bold mb-0">${d.name}</h3>
+          <p class="small ct-text-muted mb-2">${d.spec}</p>
+          <span class="ct-badge ct-badge-success">Available</span>`;
+        });
+
+        // Testimonial stories (JSON array, DOM built with textContent for safety)
+        const STORIES = [
+          {
+            title: 'From Knee Pain to Walking Freely — Mrs. Manisha Joshi',
+            quote:
+              'After two months of physiotherapy at Siddhivinayak, I can walk to the market again without pain.',
+            author: '— Mrs. Manisha Joshi, 54',
+          },
+          {
+            title: 'Journey to Motherhood — Ms. Pooja Kamble',
+            quote: 'The paediatric team guided us at every step; our baby is healthy and happy.',
+            author: '— Ms. Pooja Kamble, 29',
+          },
+          {
+            title: 'Overcoming Bravery, Mrs. Jadhav’s Methotrexate',
+            quote:
+              'The dermatologist explained the treatment patiently and got my psoriasis under control.',
+            author: '— Mrs. Sunita Jadhav, 42',
+          },
+          {
+            title: 'A Chance for Longer Life — Mr. Integrated Survivor',
+            quote:
+              'A routine screening found my blockage in time. The cardiac team literally saved my life.',
+            author: '— Mr. Ramesh Pawar, 61',
+          },
+        ];
+        const list = document.getElementById('story-list');
+        STORIES.forEach((s, i) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'ct-story-btn' + (i === 0 ? ' active' : '');
+          btn.textContent = s.title;
+          btn.addEventListener('click', function () {
+            list.querySelectorAll('.ct-story-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById('story-quote').textContent = `“${s.quote}”`;
+            document.getElementById('story-author').textContent = s.author;
+          });
+          list.appendChild(btn);
+        });
+        // First story shown by default
+        document.getElementById('story-quote').textContent = `“${STORIES[0].quote}”`;
+        document.getElementById('story-author').textContent = STORIES[0].author;
+        document.getElementById('story-play').addEventListener('click', () => {
+          window.open('tools.html', '_self'); // demo "video" navigates to the tools page
+        });
+
+        // Hero "Chat with Us" opens the widget
+        document.getElementById('hero-chat-btn').addEventListener('click', () => {
+          document.getElementById('chat-toggle').click();
+        });
+      })();
+    </script>
+  </body>
+</html>

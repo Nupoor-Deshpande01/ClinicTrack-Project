@@ -1,0 +1,267 @@
+/* site.css — layout + component styles for the Siddhivinayak Clinic landing
+   page. All colors come from the tokens in theme.css. */
+
+/* ---------- Navbar ---------- */
+.ct-navbar {
+  background: var(--ct-page);
+  border-bottom: 1px solid var(--ct-border);
+}
+
+.ct-navbar .nav-link {
+  color: var(--ct-text);
+  font-weight: 500;
+}
+
+.ct-navbar .nav-link:hover,
+.ct-navbar .nav-link.active {
+  color: var(--ct-primary);
+}
+
+.ct-logo {
+  background: var(--ct-primary-light);
+  color: var(--ct-primary);
+  font-weight: 800;
+  border-radius: 12px;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+}
+
+/* ---------- Hero ---------- */
+.ct-hero {
+  background: linear-gradient(160deg, var(--ct-primary-light) 0%, var(--ct-page) 60%);
+}
+
+.ct-hero h1 {
+  font-weight: 800;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  letter-spacing: -0.03em;
+}
+
+/* Floating glass chips over the hero image */
+.ct-glass-chip {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: var(--ct-radius-pill);
+  padding: 0.45rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: var(--ct-shadow);
+}
+
+[data-bs-theme='dark'] .ct-glass-chip {
+  background: rgba(30, 41, 59, 0.75);
+  border-color: rgba(148, 163, 184, 0.4);
+}
+
+/* Small doctor card under the illustration */
+.ct-hero-doc {
+  max-width: 260px;
+  margin-top: -2.5rem;
+  z-index: 2;
+}
+
+/* Carousel dots under the hero */
+.ct-hero-dots button {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--ct-radius-pill);
+  border: none;
+  background: var(--ct-border);
+  padding: 0;
+}
+
+.ct-hero-dots button.active {
+  background: var(--ct-primary);
+  width: 22px;
+}
+
+/* ---------- About ---------- */
+.ct-about-backing {
+  position: relative;
+}
+
+.ct-about-backing::before {
+  content: '';
+  position: absolute;
+  inset: 12% -8% -8% 22%;
+  background: var(--ct-primary-light);
+  border-radius: var(--ct-radius-lg);
+  z-index: 0;
+}
+
+.ct-about-img {
+  z-index: 1;
+  border-radius: var(--ct-radius-md);
+  width: 100%;
+  box-shadow: var(--ct-shadow);
+}
+
+.ct-check li {
+  display: flex;
+  gap: 0.6rem;
+  align-items: flex-start;
+  margin-bottom: 0.7rem;
+}
+
+.ct-check .bi-check-circle-fill {
+  color: var(--ct-primary);
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+
+/* ---------- Services ---------- */
+.ct-service-card {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.ct-service-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--ct-shadow-hover);
+}
+
+.ct-service-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--ct-primary-light);
+  color: var(--ct-primary);
+  font-size: 1.3rem;
+  display: grid;
+  place-items: center;
+}
+
+/* ---------- Testimonials ---------- */
+.ct-story-btn {
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  border-radius: 12px;
+  padding: 0.7rem 0.9rem;
+  color: var(--ct-text);
+}
+
+.ct-story-btn.active {
+  background: var(--ct-primary-light);
+  color: var(--ct-primary);
+  font-weight: 700;
+}
+
+.ct-video-frame {
+  aspect-ratio: 16 / 9;
+  border-radius: var(--ct-radius-md);
+}
+
+/* ---------- Doctors carousel ---------- */
+.ct-doc-card img {
+  width: 100%;
+  border-radius: var(--ct-radius-md);
+  object-fit: cover;
+}
+
+.ct-doc-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--ct-radius-pill);
+  background: var(--ct-primary-light);
+  color: var(--ct-primary);
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}
+
+/* ---------- Contact banner ---------- */
+.ct-contact-banner {
+  background: linear-gradient(120deg, var(--ct-primary) 0%, var(--ct-primary-dark) 100%);
+  color: #fff;
+  border-radius: var(--ct-radius-lg);
+}
+
+/* ---------- Appointment table ---------- */
+.ct-table {
+  --bs-table-color: var(--ct-text);
+  --bs-table-bg: var(--ct-surface);
+  --bs-table-border-color: var(--ct-border);
+}
+
+/* ---------- Footer ---------- */
+.ct-footer {
+  background: var(--ct-surface);
+  border-top: 1px solid var(--ct-border);
+}
+
+/* ---------- Chat widget ---------- */
+.ct-chat-toggle {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 1055;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--ct-radius-pill);
+  border: none;
+  background: var(--ct-primary);
+  color: #fff;
+  font-size: 1.3rem;
+  box-shadow: var(--ct-shadow-hover);
+  display: grid;
+  place-items: center;
+}
+
+.ct-chat-panel {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 6rem;
+  z-index: 1056;
+  width: min(340px, calc(100vw - 2.5rem));
+  max-height: min(520px, 70vh);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ct-chat-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: var(--ct-page);
+}
+
+.ct-msg {
+  max-width: 85%;
+  padding: 0.55rem 0.9rem;
+  border-radius: 14px;
+  font-size: 0.9rem;
+  white-space: pre-line;
+}
+
+.ct-msg-user {
+  align-self: flex-end;
+  background: var(--ct-primary);
+  color: #fff;
+  border-bottom-right-radius: 4px;
+}
+
+.ct-msg-bot {
+  align-self: flex-start;
+  background: var(--ct-surface);
+  border: 1px solid var(--ct-border);
+  border-bottom-left-radius: 4px;
+}
+
+/* ---------- Responsive tweaks ---------- */
+@media (max-width: 991.98px) {
+  .ct-hero-doc {
+    margin-top: 0.5rem;
+  }
+}

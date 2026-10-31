@@ -23,7 +23,7 @@ import NotFound from './pages/NotFound';
 import Forbidden from './pages/Forbidden';
 
 export default function App() {
-  const { initialising } = useAuth();
+  const { initialising, isAuthenticated } = useAuth();
 
   if (initialising) {
     return (
@@ -35,6 +35,18 @@ export default function App() {
 
   return (
     <Routes>
+      {/* Public landing page redirect: unauthenticated visitors see the clinic website */}
+      <Route
+        path="/"
+        element={
+          isAuthenticated ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <Navigate to="/site/" replace />
+          )
+        }
+      />
+
       <Route path="/login" element={<Login />} />
 
       {/* Public: the QR code printed on every prescription opens this page. */}

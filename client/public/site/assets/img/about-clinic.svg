@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 400" role="img" aria-label="Medical team illustration">
+  <rect width="420" height="400" rx="24" fill="#DBEAFE"/>
+  <!-- monitor screen -->
+  <rect x="40" y="50" width="150" height="100" rx="12" fill="#FFFFFF" stroke="#93C5FD" stroke-width="3"/>
+  <path d="M56 100 l 24 -24 l 20 20 l 30 -30 l 24 34" stroke="#2563EB" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="102" y="158" width="26" height="14" rx="4" fill="#93C5FD"/>
+  <!-- doctor figure -->
+  <circle cx="290" cy="120" r="30" fill="#FCD9C0"/>
+  <path d="M262 112 C 258 82 322 82 318 112 C 318 88 306 78 290 78 C 274 78 262 88 262 112 Z" fill="#334155"/>
+  <circle cx="280" cy="122" r="3" fill="#0F172A"/>
+  <circle cx="300" cy="122" r="3" fill="#0F172A"/>
+  <path d="M282 136 Q 290 142 298 136" stroke="#0F172A" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M290 156 C 250 156 240 180 240 210 L 340 210 C 340 180 330 156 290 156 Z" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="3"/>
+  <path d="M262 170 C 258 206 270 214 290 214" stroke="#2563EB" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <!-- patient bed -->
+  <rect x="60" y="250" width="220" height="16" rx="8" fill="#FFFFFF" stroke="#93C5FD" stroke-width="3"/>
+  <rect x="84" y="266" width="10" height="44" fill="#93C5FD"/>
+  <rect x="246" y="266" width="10" height="44" fill="#93C5FD"/>
+  <rect x="100" y="222" width="120" height="26" rx="13" fill="#2563EB"/>
+  <!-- hearts -->
+  <path d="M356 270 c -10 -14 -30 2 -14 20 l 14 14 l 14 -14 c 16 -18 -4 -34 -14 -20 z" fill="#2563EB" opacity="0.85"/>
+  <path d="M384 320 c -7 -10 -22 2 -10 15 l 10 10 l 10 -10 c 12 -13 -3 -25 -10 -15 z" fill="#93C5FD"/>
+</svg>

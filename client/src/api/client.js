@@ -11,7 +11,8 @@ const baseURL = import.meta.env.VITE_API_URL
   ? `${import.meta.env.VITE_API_URL.replace(/\/$/, '')}/api`
   : '/api';
 
-const api = axios.create({ baseURL, timeout: 15000 });
+// Increased to 60s to tolerate Render free-tier spin-up/cold starts (~30s).
+const api = axios.create({ baseURL, timeout: 60000 });
 
 // Token lives in localStorage so a refresh keeps the session.
 export const TOKEN_KEY = 'clinictrack_token';

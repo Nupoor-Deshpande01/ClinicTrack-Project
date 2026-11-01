@@ -15,6 +15,7 @@ export default [
     ignores: [
       '**/node_modules/**',
       'client/dist/**',
+      'client/public/**',
       'server/exports/**',
       'server/backups/**',
       'public-site/assets/vendor/**',

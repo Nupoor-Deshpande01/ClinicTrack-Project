@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -22,6 +23,13 @@ import Users from './pages/Users';
 import NotFound from './pages/NotFound';
 import Forbidden from './pages/Forbidden';
 
+function ExternalRedirect({ to }) {
+  useEffect(() => {
+    window.location.replace(to);
+  }, [to]);
+  return null;
+}
+
 export default function App() {
   const { initialising, isAuthenticated } = useAuth();
 
@@ -39,13 +47,10 @@ export default function App() {
       <Route
         path="/"
         element={
-          isAuthenticated ? (
-            <Navigate to="/dashboard" replace />
-          ) : (
-            <Navigate to="/site/" replace />
-          )
+          isAuthenticated ? <Navigate to="/dashboard" replace /> : <ExternalRedirect to="/site/" />
         }
       />
+      <Route path="/site/*" element={<ExternalRedirect to="/site/" />} />
 
       <Route path="/login" element={<Login />} />
 

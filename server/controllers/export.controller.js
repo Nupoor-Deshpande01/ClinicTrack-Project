@@ -47,7 +47,7 @@ async function exportBackup(req, res, next) {
     ]);
 
     const payload = {
-      clinic: 'Siddhivinayak Clinic',
+      clinic: 'CityCare Clinic',
       generatedAt: new Date().toISOString(),
       generatedBy: req.user.name,
       counts: {

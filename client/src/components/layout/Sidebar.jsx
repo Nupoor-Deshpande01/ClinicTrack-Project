@@ -57,7 +57,7 @@ export default function Sidebar({ open, onClose }) {
           </span>
           <div>
             <div className="ct-brand">ClinicTrack</div>
-            <small className="ct-text-muted">Siddhivinayak Clinic</small>
+            <small className="ct-text-muted">CityCare Clinic</small>
           </div>
           <button
             type="button"

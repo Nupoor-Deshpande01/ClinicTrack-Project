@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Download, FileBarChart, Users2, CalendarCheck2, Clock4, ListOrdered } from 'lucide-react';
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { io } from 'socket.io-client';
 import toast from 'react-hot-toast';
 import { analyticsApi, appointmentsApi } from '../api';
-import { errorMessage } from '../api/client';
+import { errorMessage, TOKEN_KEY } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import { ErrorState, LoadingState, Pill } from '../components/ui';
 import AppointmentsPanel from '../components/AppointmentsPanel';
@@ -70,6 +71,18 @@ export default function Dashboard() {
     };
   }, [range, reload]);
 
+  // Live Socket.IO listener: updates stats live when appointments/queue change
+  useEffect(() => {
+    const origin = import.meta.env.VITE_API_URL || window.location.origin;
+    const socket = io(origin, {
+      auth: { token: localStorage.getItem(TOKEN_KEY) },
+      transports: ['websocket', 'polling'],
+    });
+    socket.on('appointment:update', () => setReload(n => n + 1));
+    socket.on('queue:update', () => setReload(n => n + 1));
+    return () => socket.disconnect();
+  }, []);
+
   const chartData = useMemo(() => summary?.arrivalSeries ?? [], [summary]);
 
   /** Export today's appointments as CSV (client-side, from the API data). */
@@ -108,7 +121,7 @@ export default function Dashboard() {
       const text = [
         'ClinicTrack daily report',
         `Generated: ${new Date().toLocaleString('en-IN')}`,
-        `Clinic: Siddhivinayak Clinic, Pune`,
+        `Clinic: CityCare Clinic, Pune`,
         '',
         `Total patients: ${s.totalPatients ?? '-'}`,
         `Visits today: ${s.visitsToday ?? '-'}`,
@@ -140,7 +153,7 @@ export default function Dashboard() {
           <h1 className="ct-page-title">
             Welcome back, {user.role === 'doctor' ? `Dr. ${firstName}` : firstName}!
           </h1>
-          <p className="ct-text-muted mb-0">Here is what is happening at Siddhivinayak Clinic.</p>
+          <p className="ct-text-muted mb-0">Here is what is happening at CityCare Clinic.</p>
         </div>
         <div className="d-flex flex-wrap gap-2 align-items-center">
           <button

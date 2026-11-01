@@ -1,15 +1,14 @@
 # ClinicTrack
 
 A **version-tracked patient record system** for small clinics — pilot clinic:
-**Siddhivinayak Clinic**. Patient records behave like Git repositories and each
+**CityCare Clinic**. Patient records behave like Git repositories and each
 visit like a commit:
 
 - every edit **adds a new version** of a visit (nothing is overwritten),
 - old versions can be **diffed** side by side and **restored** (rollback),
 - every change lands in a **tamper-evident audit log** (SHA-256 hash chain).
 
-Course: _Web Technology (2310362L)_ — T.Y. B.Tech, MIT Academy of Engineering.
-Dummy data only, no real patient information.
+Full-stack clinical management, patient records and appointment portal.
 
 ## Monorepo layout
 

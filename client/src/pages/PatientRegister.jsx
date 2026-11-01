@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { ArrowLeft, Save } from 'lucide-react';
-import { patientsApi } from '../api';
+import { patientsApi, usersApi } from '../api';
 import { errorMessage } from '../api/client';
 import { patientSchema } from '../validation/schemas';
 import { PageHeader } from '../components/ui';
@@ -14,6 +14,7 @@ export default function PatientRegister() {
   const [serverError, setServerError] = useState('');
   const [duplicate, setDuplicate] = useState(null); // live duplicate-phone warning
   const [warnings, setWarnings] = useState([]);
+  const [doctors, setDoctors] = useState([]);
   const {
     register,
     handleSubmit,
@@ -21,8 +22,21 @@ export default function PatientRegister() {
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: yupResolver(patientSchema),
-    defaultValues: { gender: '', bloodGroup: '' },
+    defaultValues: {
+      gender: '',
+      bloodGroup: '',
+      treatment: '',
+      primaryDoctorId: '',
+      addToSchedule: true,
+    },
   });
+
+  useEffect(() => {
+    usersApi
+      .list('doctor')
+      .then(docs => setDoctors(docs))
+      .catch(() => setDoctors([]));
+  }, []);
 
   /** Look up an existing patient with exactly this mobile number. */
   const findSamePhone = async phone => {
@@ -183,6 +197,48 @@ export default function PatientRegister() {
                   </option>
                 ))}
               </select>
+            </div>
+
+            <div className="col-span-2">
+              <label className="ct-label" htmlFor="treatment">
+                Required Treatment / Reason for Visit *
+              </label>
+              <input
+                id="treatment"
+                className={fieldClass('treatment')}
+                placeholder="e.g. Fever & Body ache, Root Canal, Cardiology checkup, Orthopedic assessment"
+                {...register('treatment')}
+              />
+              {errors.treatment && <p className="ct-error">{errors.treatment.message}</p>}
+            </div>
+
+            <div>
+              <label className="ct-label" htmlFor="primaryDoctorId">
+                Assigned Doctor
+              </label>
+              <select id="primaryDoctorId" className="ct-select" {...register('primaryDoctorId')}>
+                <option value="">Select Doctor…</option>
+                {doctors.map(d => (
+                  <option key={d.id} value={d.id}>
+                    Dr. {d.name} ({d.specialty || 'General'})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="d-flex flex-column justify-content-center">
+              <span className="ct-label">Live Doctor Dashboard</span>
+              <div className="form-check form-switch mt-1">
+                <input
+                  type="checkbox"
+                  id="addToSchedule"
+                  className="form-check-input"
+                  {...register('addToSchedule')}
+                />
+                <label htmlFor="addToSchedule" className="form-check-label small fw-semibold">
+                  Send to today's live appointment queue
+                </label>
+              </div>
             </div>
 
             <div className="col-span-2">

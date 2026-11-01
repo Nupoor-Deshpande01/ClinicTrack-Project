@@ -67,6 +67,9 @@ async function createAppointment(req, res) {
     details: { patient: patient.mrn, at: appointment.scheduledAt },
   });
 
+  const { emitAppointment } = require('../services/realtime.service');
+  emitAppointment({ appointment, patient });
+
   res
     .status(201)
     .json({ success: true, message: 'Appointment booked.', data: { id: appointment._id } });
@@ -86,6 +89,9 @@ async function deleteAppointment(req, res) {
     entityId: req.params.id,
     details: { scheduledAt: appointment.scheduledAt },
   });
+
+  const { emitAppointment } = require('../services/realtime.service');
+  emitAppointment({ deletedId: req.params.id });
 
   res.json({ success: true, message: 'Appointment removed.' });
 }

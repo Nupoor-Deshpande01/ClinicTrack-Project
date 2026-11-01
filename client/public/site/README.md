@@ -1,6 +1,6 @@
 # ClinicTrack · Public Website
 
-Static Bootstrap 5 website for **Siddhivinayak Clinic** (Phase 1). It contains:
+Static Bootstrap 5 website for **CityCare Clinic** (Phase 1). It contains:
 
 - `index.html` — landing page (hero, about, services, testimonials, doctors carousel,
   contact banner, footer), the appointment request form with vanilla-JS validation and

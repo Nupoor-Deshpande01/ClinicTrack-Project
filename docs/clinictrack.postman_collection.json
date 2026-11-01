@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "b7f1a0c2-5d1e-4a77-9a4e-clinictrack01",
     "name": "ClinicTrack API",
-    "description": "ClinicTrack REST API (Siddhivinayak Clinic). Run **Auth → Login** first: the test script saves the JWT into the `token` collection variable and every other request inherits it.\n\nVariables: `baseUrl` (default http://localhost:5000/api), `token`, `patientId`, `visitId`, `versionId`, `prescriptionId`, `qrToken`, `queueTokenId`.",
+    "description": "ClinicTrack REST API (CityCare Clinic). Run **Auth → Login** first: the test script saves the JWT into the `token` collection variable and every other request inherits it.\n\nVariables: `baseUrl` (default http://localhost:5000/api), `token`, `patientId`, `visitId`, `versionId`, `prescriptionId`, `qrToken`, `queueTokenId`.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {

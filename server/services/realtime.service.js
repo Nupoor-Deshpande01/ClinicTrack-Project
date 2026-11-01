@@ -55,6 +55,11 @@ function emitQueue(snapshot) {
   if (io) io.to('queue').emit('queue:update', snapshot);
 }
 
+/** Broadcast new or changed appointments to connected dashboards. */
+function emitAppointment(data) {
+  if (io) io.to('queue').emit('appointment:update', data);
+}
+
 /** Stop Socket.IO + the HTTP server (used by tests). */
 function close() {
   return new Promise(resolve => {
@@ -66,4 +71,4 @@ function close() {
   });
 }
 
-module.exports = { attach, listen, emitQueue, close };
+module.exports = { attach, listen, emitQueue, emitAppointment, close };

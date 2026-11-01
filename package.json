@@ -2,7 +2,7 @@
   "name": "clinictrack",
   "version": "0.1.0",
   "private": true,
-  "description": "ClinicTrack - version-tracked patient record system for Siddhivinayak Clinic (Web Technology mini project, MIT Academy of Engineering)",
+  "description": "ClinicTrack - version-tracked patient record and clinic management system for CityCare Clinic",
   "workspaces": [
     "client",
     "server"

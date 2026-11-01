@@ -19,6 +19,7 @@ const patientSchema = new mongoose.Schema(
     bloodGroup: { type: String, enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', ''] },
     address: { type: String, trim: true },
     allergies: [{ type: String, trim: true }], // clinical data — hidden from staff
+    treatment: { type: String, trim: true }, // Desired treatment / reason for consultation
     primaryDoctorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   },
@@ -61,6 +62,17 @@ patientSchema.methods.toPatientJSON = function toPatientJSON({ includeClinical =
   // Staff (reception) must never receive clinical fields.
   if (!includeClinical) {
     delete json.allergies;
+  }
+  if (
+    this.primaryDoctorId &&
+    typeof this.primaryDoctorId === 'object' &&
+    this.primaryDoctorId.name
+  ) {
+    json.primaryDoctor = {
+      id: this.primaryDoctorId._id,
+      name: this.primaryDoctorId.name,
+      specialty: this.primaryDoctorId.specialty,
+    };
   }
   return json;
 };

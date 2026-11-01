@@ -44,7 +44,7 @@ export default function QueueBoard() {
             <HeartPulse size={22} />
           </span>
           <div>
-            <strong>Siddhivinayak Clinic</strong>
+            <strong>CityCare Clinic</strong>
             <div className="ct-board-muted">Now serving</div>
           </div>
         </div>

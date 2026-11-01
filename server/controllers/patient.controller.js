@@ -34,6 +34,7 @@ async function listPatients(req, res) {
   const [total, docs] = await Promise.all([
     Patient.countDocuments(filter),
     Patient.find(filter)
+      .populate('primaryDoctorId', 'name specialty')
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(limit),
@@ -50,7 +51,10 @@ async function listPatients(req, res) {
 
 /** GET /api/patients/:id → one patient (fields trimmed for staff). */
 async function getPatient(req, res) {
-  const patient = await Patient.findById(req.params.id);
+  const patient = await Patient.findById(req.params.id).populate(
+    'primaryDoctorId',
+    'name specialty'
+  );
   if (!patient) throw new HttpError(404, 'Patient not found.');
 
   res.json({
@@ -64,10 +68,35 @@ async function createPatient(req, res) {
   const body = req.body;
   const patient = new Patient(body);
   patient.createdBy = req.user.id;
-  if (isClinicalRole(req.user.role) && !patient.primaryDoctorId) {
+  if (body.treatment) {
+    patient.treatment = body.treatment;
+  }
+  if (body.primaryDoctorId) {
+    patient.primaryDoctorId = body.primaryDoctorId;
+  } else if (isClinicalRole(req.user.role) && !patient.primaryDoctorId) {
     patient.primaryDoctorId = req.user.id;
   }
   await patient.save();
+
+  // If assigned to a doctor (or addToSchedule is requested), automatically create today's appointment
+  // so the doctor sees it live on their dashboard right away!
+  if (patient.primaryDoctorId && body.addToSchedule !== false) {
+    try {
+      const Appointment = require('../models/appointment.model');
+      const appointment = await Appointment.create({
+        patientId: patient._id,
+        doctorId: patient.primaryDoctorId,
+        scheduledAt: new Date(),
+        disease: patient.treatment || 'General Consultation',
+        createdBy: req.user.id,
+      });
+
+      const { emitAppointment } = require('../services/realtime.service');
+      emitAppointment({ appointment, patient });
+    } catch (schedErr) {
+      console.error('Auto-schedule appointment error:', schedErr.message);
+    }
+  }
 
   // Duplicate warning (client also warns live — this is the server's, authoritative):
   const duplicate = await Patient.findOne({
@@ -110,7 +139,17 @@ async function updatePatient(req, res) {
   const patient = await Patient.findById(req.params.id);
   if (!patient) throw new HttpError(404, 'Patient not found.');
 
-  const editable = ['fullName', 'phone', 'dob', 'gender', 'bloodGroup', 'address', 'allergies'];
+  const editable = [
+    'fullName',
+    'phone',
+    'dob',
+    'gender',
+    'bloodGroup',
+    'address',
+    'allergies',
+    'treatment',
+    'primaryDoctorId',
+  ];
   const clinicalOnly = ['allergies'];
   const changes = {};
   for (const key of editable) {

@@ -6,7 +6,7 @@ export default function Appointments() {
     <>
       <PageHeader
         title="Appointments"
-        subtitle="Day-by-day bookings across Siddhivinayak Clinic. Booked by reception, assigned to a doctor."
+        subtitle="Day-by-day bookings across CityCare Clinic. Booked by reception, assigned to a doctor."
       />
       <AppointmentsPanel />
     </>

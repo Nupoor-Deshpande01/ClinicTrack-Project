@@ -287,7 +287,7 @@ the JWT.
   "message": "Prescription verified.",
   "data": {
     "valid": true,
-    "clinic": "Siddhivinayak Clinic",
+    "clinic": "CityCare Clinic",
     "issuedAt": "2026-10-30T08:31:39.000Z",
     "patient": { "fullName": "Ishita Jadhav", "mrn": "MC-00005" },
     "doctor": { "name": "Rohan Jadhav", "specialty": "Paediatrics" },

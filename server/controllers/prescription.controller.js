@@ -16,9 +16,9 @@ const User = require('../models/user.model');
 const { emitAudit } = require('../services/audit.service');
 
 const CLINIC = {
-  name: 'Siddhivinayak Clinic',
+  name: 'CityCare Clinic',
   line: 'Plot 12, Sector 24, Nigdi, Pune 411044 · +91 20 4000 1200',
-  reg: 'Reg. No. MH-PN-2213 · Dummy data, demonstration only',
+  reg: 'Reg. No. MH-PN-2213 · Digital Prescription Record',
 };
 
 /** POST /api/visits/:id/prescription — attach medicines to the CURRENT visit version. */

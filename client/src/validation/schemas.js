@@ -40,6 +40,9 @@ export const patientSchema = yup.object({
     .test('not-future', 'Date of birth cannot be in the future', v => !v || v <= todayISO()),
   gender: yup.string().oneOf(['male', 'female', 'other']).required('Select a gender'),
   bloodGroup: yup.string().optional(),
+  treatment: yup.string().max(300, 'Keep treatment details under 300 characters').optional(),
+  primaryDoctorId: yup.string().optional(),
+  addToSchedule: yup.boolean().optional(),
   address: yup.string().max(200, 'Address is too long'),
   allergies: yup.string().max(200, 'Keep allergies under 200 characters'),
 });

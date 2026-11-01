@@ -89,6 +89,21 @@ export default function PatientProfile() {
                 <span className="ct-help">Registered</span>
                 <div>{fmtDate(patient.createdAt)}</div>
               </div>
+              {patient.treatment && (
+                <div className="col-span-2">
+                  <span className="ct-help">Required Treatment / Reason for Visit</span>
+                  <div className="fw-semibold text-primary">{patient.treatment}</div>
+                </div>
+              )}
+              {patient.primaryDoctor && (
+                <div className="col-span-2">
+                  <span className="ct-help">Assigned Doctor</span>
+                  <div>
+                    Dr. {patient.primaryDoctor.name} ({patient.primaryDoctor.specialty || 'General'}
+                    )
+                  </div>
+                </div>
+              )}
               <div className="col-span-2">
                 <span className="ct-help">Address</span>
                 <div>{patient.address || '—'}</div>

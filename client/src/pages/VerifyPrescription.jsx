@@ -31,7 +31,7 @@ export default function VerifyPrescription() {
     <div className="ct-verify">
       <div className="ct-verify-card ct-card">
         <div className="ct-verify-head">
-          <strong>Siddhivinayak Clinic</strong>
+          <strong>CityCare Clinic</strong>
           <small>Prescription verification</small>
         </div>
 

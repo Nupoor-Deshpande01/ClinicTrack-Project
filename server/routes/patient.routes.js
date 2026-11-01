@@ -36,6 +36,14 @@ const patientRules = [
     .trim()
     .isLength({ max: 60 })
     .withMessage('Allergy names max 60 chars'),
+  body('treatment')
+    .optional()
+    .isString()
+    .trim()
+    .isLength({ max: 300 })
+    .withMessage('Treatment description max 300 characters'),
+  body('primaryDoctorId').optional().isMongoId().withMessage('Invalid doctor id'),
+  body('addToSchedule').optional().isBoolean(),
 ];
 
 router.get(

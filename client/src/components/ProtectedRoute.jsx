@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
  *  - not logged in → /login (remembering where the user wanted to go)
  *  - logged in but wrong role → /forbidden (no silent redirect confusion)
  */
-export default function ProtectedRoute({ roles }) {
+export default function ProtectedRoute({ roles, children }) {
   const { isAuthenticated, user } = useAuth();
   const location = useLocation();
 
@@ -16,5 +16,5 @@ export default function ProtectedRoute({ roles }) {
   if (roles && !roles.includes(user.role)) {
     return <Navigate to="/forbidden" replace />;
   }
-  return <Outlet />;
+  return children ? children : <Outlet />;
 }

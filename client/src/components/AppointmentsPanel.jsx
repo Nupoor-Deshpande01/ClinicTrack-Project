@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Eye, Trash2 } from 'lucide-react';
+import { io } from 'socket.io-client';
 import toast from 'react-hot-toast';
 import { appointmentsApi } from '../api';
-import { errorMessage } from '../api/client';
+import { errorMessage, TOKEN_KEY } from '../api/client';
 import { EmptyState, ErrorState, LoadingState, Pill } from './ui';
 
 const dayLabel = d => d.toLocaleDateString('en-IN', { weekday: 'short' });
@@ -24,6 +25,19 @@ export default function AppointmentsPanel() {
     const pad = n => String(n).padStart(2, '0');
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
   };
+
+  // Live Socket.IO listener: whenever staff books an appointment, doctors see it live!
+  useEffect(() => {
+    const origin = import.meta.env.VITE_API_URL || window.location.origin;
+    const socket = io(origin, {
+      auth: { token: localStorage.getItem(TOKEN_KEY) },
+      transports: ['websocket', 'polling'],
+    });
+    socket.on('appointment:update', () => {
+      setReload(n => n + 1);
+    });
+    return () => socket.disconnect();
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -105,7 +119,7 @@ export default function AppointmentsPanel() {
                 <th scope="col">Patient</th>
                 <th scope="col">Assigned Doctor</th>
                 <th scope="col">Time</th>
-                <th scope="col">Disease</th>
+                <th scope="col">Treatment / Concern</th>
                 <th scope="col">Actions</th>
               </tr>
             </thead>

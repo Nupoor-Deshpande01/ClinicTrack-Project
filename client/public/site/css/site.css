@@ -1,4 +1,4 @@
-/* site.css — layout + component styles for the Siddhivinayak Clinic landing
+/* site.css — layout + component styles for the CityCare Clinic landing
    page. All colors come from the tokens in theme.css. */
 
 /* ---------- Navbar ---------- */
@@ -83,6 +83,7 @@
 /* ---------- About ---------- */
 .ct-about-backing {
   position: relative;
+  isolation: isolate;
 }
 
 .ct-about-backing::before {
@@ -95,9 +96,12 @@
 }
 
 .ct-about-img {
+  position: relative;
   z-index: 1;
+  display: block;
   border-radius: var(--ct-radius-md);
   width: 100%;
+  height: auto;
   box-shadow: var(--ct-shadow);
 }
 

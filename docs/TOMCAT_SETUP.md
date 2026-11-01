@@ -117,7 +117,7 @@ ships it — `public-site/WEB-INF/web.xml`:
          version="6.0"
          xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee
                              https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
-  <description>Siddhivinayak Clinic static website (ClinicTrack mini project)</description>
+  <description>CityCare Clinic static website (ClinicTrack mini project)</description>
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
   </welcome-file-list>

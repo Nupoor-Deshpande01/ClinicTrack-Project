@@ -62,9 +62,7 @@ export default function Login() {
         </div>
         <div>
           <h2>Patient records with a memory — every visit versioned, every change auditable.</h2>
-          <p className="opacity-75 mb-0">
-            Siddhivinayak Clinic · Web Technology mini project (2310362L)
-          </p>
+          <p className="opacity-75 mb-0">CityCare Clinic · Patient Management Portal</p>
         </div>
         <small className="opacity-75">Version-tracked records. Tamper-evident audit trail.</small>
       </div>

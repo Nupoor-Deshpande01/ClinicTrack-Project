@@ -115,6 +115,7 @@ export default function Patients() {
                     <th scope="col">MRN</th>
                     <th scope="col">Age / Gender</th>
                     <th scope="col">Phone</th>
+                    <th scope="col">Treatment</th>
                     {isClinical && <th scope="col">Allergies</th>}
                     <th scope="col" />
                   </tr>
@@ -135,6 +136,13 @@ export default function Patients() {
                         {p.age} · <span className="text-capitalize">{p.gender}</span>
                       </td>
                       <td>{p.phone}</td>
+                      <td>
+                        {p.treatment ? (
+                          <Pill tone="info">{p.treatment}</Pill>
+                        ) : (
+                          <span className="ct-text-muted small">—</span>
+                        )}
+                      </td>
                       {isClinical && (
                         <td>
                           {(p.allergies || []).length === 0 ? (

@@ -8,7 +8,7 @@ const CHAT_INTENTS = {
   greeting: {
     keywords: ['hi', 'hello', 'hey', 'namaste', 'good morning', 'good evening'],
     reply:
-      'Namaste! Welcome to Siddhivinayak Clinic. Ask me about timings, services, doctors or booking an appointment.',
+      'Namaste! Welcome to CityCare Clinic. Ask me about timings, services, doctors or booking an appointment.',
   },
   timings: {
     keywords: ['timing', 'timings', 'hours', 'open', 'close', 'closed', 'sunday', 'weekend'],

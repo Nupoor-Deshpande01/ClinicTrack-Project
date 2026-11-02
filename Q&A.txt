@@ -1,0 +1,815 @@
+================================================================================
+CLINICTRACK - COMPLETE WEB TECHNOLOGY VIVA PREPARATION GUIDE (ALL 7 TOPICS)
+Subject: Web Technology (Course Code: 2310362L, AY: 2025-2026)
+Degree: Third Year B.Tech (Computer Engineering / Software Engineering), MIT AOE
+Project: ClinicTrack (Version-Tracked Clinic & Patient Management System)
+================================================================================
+
+This document is divided into:
+1. High-Level Project Architecture & Technology Mapping
+2. Deep Dive into all 7 Syllabus Practicals:
+   - Part A: Project Implementation (Where and how it is implemented in ClinicTrack)
+   - Part B: Core Theoretical Viva Questions & Model Answers
+   - Part C: Examiner-Targeted Project Defense & Code Walkthrough Questions
+3. Cross-Cutting Viva Topics (JWT Auth, RBAC, WebSockets, SHA-256 Audit Trail)
+4. Self-Study Component Coverage (Apache Tomcat, Amazon DynamoDB, Apache Cassandra)
+5. 25 Rapid-Fire Examiner Q&A Cheat-Sheet
+
+================================================================================
+SECTION 1: HIGH-LEVEL ARCHITECTURE & SYLLABUS MAPPING
+================================================================================
+
+Our project, ClinicTrack, is structured as a full-stack Monorepo designed to
+explicitly fulfill and exceed all 7 practicals of the Web Technology syllabus:
+
+Syllabus Practical  | Technology / Topic              | Location in Project
+--------------------+---------------------------------+----------------------------------------
+Practical No. 01    | HTML5, CSS3, Bootstrap 5,       | public-site/index.html,
+                    | Responsive Design, Apache Tomcat| public-site/css/, WEB-INF/web.xml
+--------------------+---------------------------------+----------------------------------------
+Practical No. 02    | Vanilla JavaScript, JSON, Array | public-site/js/appointment.js,
+                    | Store, Validation, Interactive  | public-site/js/tools.js (Calculators),
+                    | Applications (Calculator, Chat) | public-site/js/chat.js (Chatbot)
+--------------------+---------------------------------+----------------------------------------
+Practical No. 03    | Front-End Framework: ReactJS,   | client/src/ (Vite + React 18 SPA),
+                    | Client-side Validation (Yup +   | client/src/validation/schemas.js,
+                    | React Hook Form), Interactive UI| client/src/pages/, client/src/context/
+--------------------+---------------------------------+----------------------------------------
+Practical No. 04    | Server-side Development: NodeJS | server/index.js, server/app.js,
+                    | Core Modules, Streams, Crypto,  | server/scripts/smoke.js,
+                    | Events, node-cron, Validation   | node-cron background task
+--------------------+---------------------------------+----------------------------------------
+Practical No. 05    | Web App Framework: ExpressJS    | server/app.js, server/routes/,
+                    | Middleware pipeline, Error      | server/middleware/ (auth, error,
+                    | Handling, Static Serving        | validate), server/controllers/
+--------------------+---------------------------------+----------------------------------------
+Practical No. 06    | RESTful API & Cloud Deployment  | server/routes/*.js, docs/API.md,
+                    | CRUD Operations, Postman Testing| docs/clinictrack.postman_collection.json,
+                    | Vercel (Front) + Render (Back)  | docs/DEPLOYMENT.md
+--------------------+---------------------------------+----------------------------------------
+Practical No. 07    | NoSQL Database: MongoDB, Mongoose| server/models/ (*.js), MongoDB Atlas,
+                    | Schemas, Queries, Aggregation,  | mongodb-memory-server (zero-setup dev),
+                    | DynamoDB & Cassandra comparison | server/seed/seed.js
+--------------------+---------------------------------+----------------------------------------
+
+
+================================================================================
+TOPIC 1: HTML, CSS & FRAMEWORKS (BOOTSTRAP) + APACHE TOMCAT
+================================================================================
+
+--- PART A: HOW IT IS IMPLEMENTED IN OUR PROJECT ---
+- Location: `public-site/` directory.
+- Files:
+  * `public-site/index.html`: Complete single-page marketing & landing page for
+    CityCare Clinic. Contains accessible semantic HTML5 elements (<header>, <nav>,
+    <main>, <section>, <article>, <footer>).
+  * `public-site/tools.html`: Dedicated interactive portal featuring responsive
+    grid layouts for clinical utilities.
+  * `public-site/css/theme.css`: Custom CSS3 variables (design tokens: --ct-primary,
+    --ct-accent, --ct-bg, typography, elevation shadows) shared with the React app.
+  * `public-site/css/site.css`: Custom styling, card transitions, dark mode overrides.
+  * `public-site/WEB-INF/web.xml`: Standard Java EE deployment descriptor allowing
+    the entire public-site directory to be deployed as an exploded WAR onto
+    Apache Tomcat web application server.
+- Key Bootstrap 5 features used:
+  * Grid System (`container`, `row`, `col-12`, `col-md-6`, `col-lg-4`): Fluid and
+    breakpoint-responsive layout on mobile, tablet, and desktop screens.
+  * Components: Bootstrap Navbar with mobile collapse hamburger toggler, Cards with
+    hover lift, Doctors carousel/slider, Modal popups, Badges, Alert dismissibles.
+  * Utilities: Flexbox (`d-flex`, `justify-content-between`, `align-items-center`),
+    Spacing (`p-4`, `mb-3`, `gap-2`).
+
+--- PART B: EXPECTED THEORETICAL VIVA QUESTIONS & MODEL ANSWERS ---
+
+Q1: What is HTML5 and what are Semantic Elements? Why use them?
+A: HTML5 is the 5th major version of HyperText Markup Language. Semantic elements
+   clearly describe their meaning to both the browser and the developer (e.g.,
+   `<header>`, `<nav>`, `<main>`, `<section>`, `<article>`, `<aside>`, `<footer>`).
+   Benefits:
+   1. Search Engine Optimization (SEO): Web crawlers prioritize semantic tags.
+   2. Accessibility (a11y): Screen readers for visually impaired users easily
+      navigate document landmarks.
+   3. Maintainability: Much cleaner structure than nested `<div>` "div soup".
+
+Q2: What is the CSS Box Model?
+A: Every HTML element on a webpage is rendered as a rectangular box comprising
+   four concentric layers (from inside out):
+   1. Content: The actual text, image, or media.
+   2. Padding: Transparent area clearing space immediately around content.
+   3. Border: The line surrounding the padding and content.
+   4. Margin: Transparent area outside the border separating it from neighbor elements.
+   * Note on `box-sizing: border-box`: By default (`content-box`), width only
+     applies to the content. In modern web design and Bootstrap, `border-box` is
+     applied globally so `width = content + padding + border`, preventing layout
+     overflows when padding is added.
+
+Q3: What is the difference between CSS Flexbox and CSS Grid?
+A: - Flexbox is 1-Dimensional: Designed for laying out items along a single axis
+     (either as a row or a column). Perfect for navigation bars, alignment, and
+     linear stacks.
+   - CSS Grid is 2-Dimensional: Designed for laying out items simultaneously across
+     both rows and columns. Ideal for overall page skeletons, photo galleries,
+     and complex dashboard tile layouts.
+
+Q4: How does Bootstrap 5 achieve responsiveness? Explain the 12-column grid.
+A: Bootstrap uses a mobile-first 12-column flexbox grid. Viewports are broken down
+   using CSS media queries into standard breakpoints:
+   - xs (<576px), sm (≥576px), md (≥768px), lg (≥992px), xl (≥1200px), xxl (≥1400px).
+   A `.container` wraps `.row`, and rows contain `.col-*` classes. The sum of
+   column spans in a row equals 12 (e.g., `col-12 col-md-6 col-lg-4` spans 100%
+   width on mobile, 50% width on tablets, and 33.3% on desktop screens).
+
+Q5: What is Apache Tomcat and how did you configure/deploy your site to it?
+A: Apache Tomcat is an open-source Java Servlet Container and Web Server that
+   implements Jakarta Servlet and Jakarta Server Pages (JSP) specifications.
+   How we deployed:
+   1. We created the `WEB-INF/` folder with `web.xml` deployment descriptor.
+   2. Configured welcome-file-list pointing to `index.html`.
+   3. Copied the `public-site` directory into Tomcat's `webapps/clinictrack/` folder
+      or packaged it as `clinictrack.war` via `jar -cvf clinictrack.war *`.
+   4. Started Tomcat using `bin/startup.sh` (or `startup.bat`). It listens on
+      port 8080 by default (`http://localhost:8080/clinictrack/`).
+
+--- PART C: EXAMINER PROJECT DEFENSE QUESTIONS ---
+- "Show me your Tomcat configuration file."
+  Answer: Point to [public-site/WEB-INF/web.xml]. Explain how the `<welcome-file-list>`
+  points to `index.html` and mime-mappings ensure correct asset headers.
+- "How does your public website integrate with your Node/React app?"
+  Answer: In development, Express serves `public-site/` as static assets at `/site`
+  via `express.static(path.join(__dirname, '../public-site'))`. The React login
+  screen has a direct "Back to Clinic Website" navigation link.
+
+
+================================================================================
+TOPIC 2: JAVASCRIPT, DOM, JSON & ARRAY STORES, INTERACTIVE APPS
+================================================================================
+
+--- PART A: HOW IT IS IMPLEMENTED IN OUR PROJECT ---
+- Location: `public-site/js/`
+- Files:
+  * `public-site/js/appointment.js`: Demonstrates in-memory storage of appointment
+    requests using a native JavaScript Array of JSON objects:
+    `const appointments = [ { id, name, phone, service, date, notes, createdAt }, ... ]`.
+    Includes strict validation *before* mutating the array, DOM rendering of table
+    rows, inline error badge displays, and edit/delete capability.
+  * `public-site/js/tools.js`:
+    1. BMI Calculator: Parses weight (kg) and height (cm), computes BMI = weight/(height/100)^2,
+       validates bounds, and dynamically renders formatted category badges (Underweight,
+       Normal, Overweight, Obese) using DOM manipulation (`document.createElement`).
+    2. Paediatric Dose Calculator: Computes weight-based Paracetamol doses (15mg/kg),
+       checks minimum and maximum safe thresholds, displaying warnings.
+    3. Appointment Slot Picker: Computes available morning and evening slots.
+  * `public-site/js/chat.js` & `chat-data.js`: Rule-based interactive chatbot
+    window that matches user query tokens against JSON intent databases, displaying
+    instant interactive replies with auto-scrolling chat history.
+
+--- PART B: EXPECTED THEORETICAL VIVA QUESTIONS & MODEL ANSWERS ---
+
+Q1: What is the DOM (Document Object Model)?
+A: The DOM is an in-memory, tree-structured object representation of an HTML document
+   created by the browser. Each HTML tag, attribute, and text snippet becomes a
+   node in this tree. JavaScript uses the DOM API (e.g., `document.getElementById`,
+   `querySelector`, `addEventListener`) to dynamically read, modify, add, or delete
+   HTML elements and styles without refreshing the page.
+
+Q2: What is JSON? Why is it preferred over XML in web applications?
+A: JSON stands for JavaScript Object Notation. It is a lightweight, human-readable,
+   text-based data interchange format.
+   Why preferred over XML:
+   1. Native to JavaScript: Directly parsed into JS objects via `JSON.parse()`
+      and serialized via `JSON.stringify()`.
+   2. Less verbose: No heavy opening and closing tags, drastically reducing network payload.
+   3. Type-aware: Supports strings, numbers, booleans, arrays, objects, and null.
+
+Q3: Difference between `var`, `let`, and `const`?
+A: - `var`: Function-scoped, hoisted to top with initial value `undefined`, can be
+     re-declared and mutated. Avoided in modern ES6+.
+   - `let`: Block-scoped (bounded by `{}`), hoisted into a "Temporal Dead Zone" (TDZ),
+     cannot be re-declared in the same scope, can be re-assigned.
+   - `const`: Block-scoped, in TDZ until evaluated, cannot be re-declared or
+     re-assigned. (Note: For objects and arrays declared with `const`, properties
+     or elements can still be mutated, but the reference cannot be reassigned).
+
+Q4: What is Event Bubbling vs Event Capturing? What is Event Delegation?
+A: - Event Bubbling: When an event fires on an element, it first runs handlers on that
+     target, then on its parent, and travels all the way up the ancestor tree to `document`.
+   - Event Capturing: The reverse flow, where the event travels down from `window`
+     to the target element before bubbling starts.
+   - Event Delegation: A performance optimization where instead of attaching an event
+     listener to 100 individual table buttons, we attach a single listener on the parent
+     `<table>`. When any button inside is clicked, the event bubbles up to the table,
+     and we check `event.target.closest('.btn-delete')`.
+
+Q5: What is the difference between `==` and `===`?
+A: `==` is the loose/abstract equality operator, which performs type coercion before
+   comparison (e.g., `'5' == 5` evaluates to `true`).
+   `===` is the strict equality operator, which compares both value and data type
+   without type coercion (e.g., `'5' === 5` evaluates to `false`). Always use `===`.
+
+--- PART C: EXAMINER PROJECT DEFENSE QUESTIONS ---
+- "Where is your JSON/Array store in JavaScript?"
+  Answer: Point to [public-site/js/appointment.js]. Show line ~15 where `const appointments = [...]`
+  is declared. Show the functions `addAppointment()`, `renderTable()`, and `deleteAppointment()`.
+- "Show me how you validate input before saving into the array."
+  Answer: Point to `validateAll()` in `appointment.js`. It runs regex patterns:
+  name regex (`/^[A-Za-z][A-Za-z .-]{1,58}$/`) and Indian phone regex (`/^[6-9]\d{9}$/`).
+  If validation fails, `U.setError()` injects error text into `<span class="ct-error">`
+  and the function returns `false`, aborting array insertion.
+
+
+================================================================================
+TOPIC 3: FRONT-END JAVASCRIPT FRAMEWORKS: REACTJS
+================================================================================
+
+--- PART A: HOW IT IS IMPLEMENTED IN OUR PROJECT ---
+- Location: `client/`
+- Build Tool: Vite 5 (ultra-fast HMR and ES module bundling)
+- Routing: React Router DOM 6 (`client/src/App.jsx`) with nested layout routes,
+  `<ProtectedRoute>` component, and role-based route guards (`allowedRoles`).
+- State Management: React Context API (`AuthContext.jsx`) managing authenticated
+  user state, JWT tokens in `localStorage`, role privileges (`doctor`, `staff`, `admin`).
+- Client-Side Validation:
+  * Library: `react-hook-form` paired with `@hookform/resolvers/yup` and `yup`.
+  * Schemas: `client/src/validation/schemas.js` containing declarative schemas
+    (`loginSchema`, `patientSchema`, `visitSchema`, `prescriptionSchema`, `appointmentSchema`).
+  * Features: Live real-time error messages rendered beneath inputs, disabling
+    invalid submissions, custom date boundary tests (e.g., `not-future` validation).
+- Interactive Features:
+  * Live Waiting-Room Queue (`/queue`): Issue tokens, advance patients, mark "Done".
+  * Full-Screen Queue Board (`/queue/board`): Real-time "Now Serving" TV display.
+  * Audit Log Integrity Verifier (`/audit`): Computes SHA-256 hashes live in-browser.
+  * Analytics Charts (`/analytics`): Interactive SVG graphs using `recharts`.
+
+--- PART B: EXPECTED THEORETICAL VIVA QUESTIONS & MODEL ANSWERS ---
+
+Q1: What is React and how does the Virtual DOM work?
+A: React is an open-source, component-based front-end JavaScript library developed
+   by Meta for building fast, declarative user interfaces.
+   Virtual DOM Architecture:
+   1. The Virtual DOM is a lightweight, in-memory copy of the real browser DOM.
+   2. When component state changes, React renders a new Virtual DOM tree.
+   3. React runs a "Diffing Algorithm" (Reconciliation) comparing the new Virtual DOM
+      with the previous snapshot.
+   4. It calculates the minimum number of changes required and batches these updates
+      to the real DOM, preventing costly layout reflows and repaints.
+
+Q2: What is JSX (JavaScript XML)?
+A: JSX is a syntax extension for JavaScript that looks similar to HTML. It allows
+   developers to write markup directly inside JavaScript files.
+   Babel/Vite transforms JSX into pure JavaScript calls:
+   `<h1>Hello</h1>` -> `React.createElement('h1', null, 'Hello')`.
+
+Q3: What are React Hooks? Explain `useState`, `useEffect`, and `useContext`.
+A: Hooks are functions introduced in React 16.8 that allow functional components
+   to use state and lifecycle features without writing ES6 class components.
+   - `useState(initial)`: Declares a state variable and setter function.
+   - `useEffect(callback, deps)`: Handles side effects (data fetching, DOM listeners,
+     WebSocket subscriptions). Runs after render. If dependencies array `deps` is `[]`,
+     it runs once on mount; if dependencies change, it re-runs. Return function acts
+     as cleanup (unmount).
+   - `useContext(MyContext)`: Subscribes to React Context without nesting `<Context.Consumer>`.
+
+Q4: Why use React Hook Form + Yup over manual React `onChange` state?
+A: 1. Performance: Traditional controlled inputs trigger a re-render of the entire
+      component on *every keystroke*. `react-hook-form` uses uncontrolled inputs via
+      refs, isolating re-renders only to validation status updates.
+   2. Schema Decoupling: `yup` allows defining validation schemas in clean,
+      reusable declarative objects (`schemas.js`) separated from the UI component.
+   3. Built-in error handling, touched state tracking, and asynchronous validation.
+
+Q5: What is a Single Page Application (SPA)? How does Client-Side Routing work?
+A: In an SPA, the browser loads a single `index.html` page along with bundled JS/CSS.
+   When the user clicks links, instead of requesting a new HTML page from the server,
+   a client-side router (like `react-router-dom`) intercepts the URL change using
+   the HTML5 History API (`pushState`), dynamically unmounting old components and
+   mounting new ones instantly without a white screen or full page reload.
+
+--- PART C: EXAMINER PROJECT DEFENSE QUESTIONS ---
+- "Where is your React client-side validation logic?"
+  Answer: Open [client/src/validation/schemas.js]. Show `patientSchema`. Point out
+  the Yup rules: `.matches(/^[6-9]\d{9}$/)` for Indian phones, `.test('not-future')`
+  for birth date, and required field triggers.
+- "How do you protect private routes in React?"
+  Answer: Point to `<ProtectedRoute>` in [client/src/App.jsx]. It checks if `user`
+  exists in `AuthContext`. If unauthenticated, it redirects to `/login`. If
+  `allowedRoles` is passed (e.g. `doctor`), it verifies `user.role`, otherwise
+  redirecting unauthorized staff to the default dashboard.
+
+
+================================================================================
+TOPIC 4: SERVER-SIDE DEVELOPMENT: NODEJS
+================================================================================
+
+--- PART A: HOW IT IS IMPLEMENTED IN OUR PROJECT ---
+- Location: `server/`
+- Runtime: Node.js (v18+ LTS)
+- Architecture:
+  * Asynchronous, single-threaded Event Loop utilizing `libuv` thread pool for
+    underlying file and database I/O.
+  * Core Node Modules used:
+    1. `crypto`: Generates cryptographically secure random bytes for JWT secrets,
+       and computes SHA-256 hashes for the tamper-evident clinical audit chain.
+    2. `fs` / `path`: File system operations, resolving paths for public-site serving,
+       database seed loading, and PDF exports.
+    3. `http`: Standard `http.createServer(app)` instance shared synchronously between
+       the Express API and Socket.IO WebSocket server (`server/index.js`).
+    4. `events` / `stream`: Used by `pdfkit` to stream generated digital prescriptions
+       directly to HTTP response buffers without writing intermediate files to disk.
+- Scheduled Cron Tasks:
+  * `node-cron` in `server/index.js` executing automated background maintenance
+    (e.g., auto-archiving stale waiting tickets and running nightly data cleanup).
+
+--- PART B: EXPECTED THEORETICAL VIVA QUESTIONS & MODEL ANSWERS ---
+
+Q1: What is Node.js? Is it single-threaded or multi-threaded?
+A: Node.js is an open-source, cross-platform JavaScript runtime environment built
+   on Google Chrome's V8 JavaScript engine.
+   - Node.js is single-threaded in its JavaScript execution thread (Event Loop).
+   - However, Node.js is internally multi-threaded through `libuv`, which provides
+     a thread pool (default 4 threads) to execute heavy operating-system-level
+     tasks asynchronously (e.g., file system I/O, DNS lookup, crypto operations).
+
+Q2: Explain the Node.js Event Loop and its phases.
+A: The Event Loop is the mechanism that allows Node.js to perform non-blocking I/O
+   operations despite having a single JavaScript execution thread.
+   Phases of the Event Loop:
+   1. Timers Phase: Executes callbacks scheduled by `setTimeout()` and `setInterval()`.
+   2. Pending Callbacks Phase: Executes I/O callbacks deferred to the next loop iteration.
+   3. Idle, Prepare Phase: Internal system operations.
+   4. Poll Phase: Retrieves new I/O events, reads network sockets, executes I/O callbacks.
+   5. Check Phase: Executes `setImmediate()` callbacks.
+   6. Close Callbacks Phase: Handles close events (e.g., `socket.on('close')`).
+   * Microtask Queue (`process.nextTick()` and `Promise.then()`): Processed immediately
+     after each phase before transitioning to the next phase!
+
+Q3: Difference between Synchronous (Blocking) and Asynchronous (Non-blocking) code?
+A: - Synchronous: Code executes sequentially line-by-line. If a function performs
+     a blocking task (e.g., `fs.readFileSync`), the entire single thread freezes,
+     and no other user can access the server until the file read completes.
+   - Asynchronous: Code initiates an I/O operation (e.g., `fs.readFile` or a DB query)
+     and attaches a callback/Promise. Node delegates the operation to the OS/libuv
+     and immediately moves to the next instruction. Once done, the callback is
+     placed on the event queue, keeping the server responsive to thousands of concurrent users.
+
+Q4: What are Node.js Streams and Buffers?
+A: - Buffer: A chunk of raw memory allocated outside the V8 heap used to handle
+     binary data directly (e.g., image upload, raw TCP sockets).
+   - Stream: An abstraction for reading or writing data sequentially piece-by-piece
+     without keeping the entire dataset in RAM at once. Four types: Readable,
+     Writable, Duplex, Transform. (Example: Streaming a 500MB PDF to the client
+     uses negligible RAM because data chunks are piped directly to the response).
+
+Q5: What is the purpose of `package.json` and `package-lock.json`?
+A: - `package.json`: Manifest file containing project metadata, scripts (`start`, `dev`),
+     and dependency version ranges (using `^` for minor and `~` for patch updates).
+   - `package-lock.json`: Automatically generated file recording the exact dependency
+     tree and cryptographic hash of every installed sub-dependency, guaranteeing
+     identical builds across different machines (deterministic installs).
+
+--- PART C: EXAMINER PROJECT DEFENSE QUESTIONS ---
+- "Where is Node.js core functionality used in your project?"
+  Answer: Point to [server/index.js]. Show how `http.createServer(app)` attaches
+  both Express and Socket.IO. Show [server/controllers/prescription.controller.js]
+  using `pdfkit` streaming with Node Buffers to generate downloadable prescription PDFs.
+- "Why did you use Node.js over Apache HTTP/PHP for this project?"
+  Answer: Node.js offers unified full-stack JavaScript (same language front-to-back),
+  native JSON handling, and exceptional asynchronous I/O performance perfect for
+  concurrent patient queue updates and real-time Socket.IO WebSockets.
+
+
+================================================================================
+TOPIC 5: WEB APPLICATION FRAMEWORK: EXPRESSJS
+================================================================================
+
+--- PART A: HOW IT IS IMPLEMENTED IN OUR PROJECT ---
+- Location: `server/app.js` and `server/routes/`
+- Middleware Pipeline:
+  1. Security: `helmet()` setting secure HTTP response headers (XSS filter, HSTS, frameguard).
+  2. Cross-Origin: `cors({ origin: CLIENT_URL, credentials: true })`.
+  3. Traffic Defense: `express-rate-limit` limiting general routes to 500 req/15min,
+     and strict brute-force prevention on `/api/auth/login` (max 20 req/15min).
+  4. Parsing: `express.json({ limit: '1mb' })` and `express.urlencoded()`.
+  5. Logging: `morgan('dev')` logging method, status, response time to console.
+  6. Static Hosting: `express.static()` serving `public-site/` at `/site`.
+  7. Server-Side Validation Middleware: `express-validator` wrapper in
+     `server/middleware/validate.js` checking request body, query, and params.
+  8. Centralized Error Handler: Custom error handling middleware in
+     `server/middleware/error.js` catching `HttpError` instances.
+
+--- PART B: EXPECTED THEORETICAL VIVA QUESTIONS & MODEL ANSWERS ---
+
+Q1: What is ExpressJS? Why use it on top of raw Node.js?
+A: ExpressJS is a minimal, fast, and flexible web application framework for Node.js.
+   Raw Node.js requires manual URL parsing, query string parsing, regex routing,
+   manual HTTP header setting, and complex chunk concatenation for request bodies.
+   Express provides an intuitive routing API (`app.get()`, `app.post()`), robust
+   middleware pipelines, template rendering, and standard request/response abstractions.
+
+Q2: What is Middleware in Express? What is `next()`?
+A: A middleware function is a function that has access to the Request object (`req`),
+   the Response object (`res`), and the next middleware function in the application’s
+   request-response cycle (`next`).
+   Capabilities:
+   - Execute any code.
+   - Make changes to the request and response objects (e.g., attaching `req.user`).
+   - End the request-response cycle (e.g., `res.status(401).json(...)`).
+   - Call `next()` to pass control to the subsequent middleware function in the chain.
+   If a middleware neither ends the request nor calls `next()`, the client request hangs!
+
+Q3: What are the types of Middleware in Express?
+A: 1. Application-level middleware: Bound to `app.use()` (e.g., `cors()`, `express.json()`).
+   2. Router-level middleware: Bound to `router.use()` (e.g., `router.use(protect)`).
+   3. Error-handling middleware: Takes 4 arguments `(err, req, res, next)`.
+   4. Built-in middleware: `express.static()`, `express.json()`.
+   5. Third-party middleware: `helmet`, `morgan`, `express-rate-limit`.
+
+Q4: How does Error Handling work in Express?
+A: Express looks for middleware functions with 4 parameters: `(err, req, res, next)`.
+   Whenever an error is passed to `next(err)` or an unhandled exception is thrown,
+   Express skips all remaining normal middleware and routes, jumping directly into
+   the error handler.
+   Our project uses `server/middleware/error.js` to log errors, format friendly
+   JSON error payloads `{ success: false, message, errors }`, and mask sensitive
+   internal stack traces in production.
+
+Q5: What is CORS and why is it needed?
+A: CORS stands for Cross-Origin Resource Sharing. It is a browser security mechanism
+   enforced by the Same-Origin Policy (SOP). Browsers block web pages from making
+   AJAX/fetch requests to a different domain, port, or protocol than the one serving
+   the page. The server must send back specific headers (like `Access-Control-Allow-Origin`)
+   to explicitly authorize cross-origin requests from the React client.
+
+--- PART C: EXAMINER PROJECT DEFENSE QUESTIONS ---
+- "Show me your Express middleware chain."
+  Answer: Open [server/app.js]. Walk through lines 25 to 55 showing `helmet()`,
+  `cors()`, `rateLimit()`, `express.json()`, and route attachments.
+- "How do you handle server-side validation in Express?"
+  Answer: Open [server/middleware/validate.js]. Show how it takes `rules` from
+  `express-validator`, executes them, calls `validationResult(req)`, and if errors
+  exist, halts execution and returns HTTP 422 Unprocessable Entity with error fields.
+
+
+================================================================================
+TOPIC 6: RESTFUL API & CLOUD DEPLOYMENT
+================================================================================
+
+--- PART A: HOW IT IS IMPLEMENTED IN OUR PROJECT ---
+- Location: `server/routes/` and `docs/API.md`
+- Endpoints & CRUD Architecture:
+  * Patients:
+    - `POST /api/patients`: Create patient (staff/doctor/admin) [Create]
+    - `GET /api/patients?page=1&limit=10`: List patients with pagination [Read]
+    - `GET /api/patients/:id`: Retrieve single patient details [Read]
+    - `PUT /api/patients/:id`: Update patient demographics (doctor/admin) [Update]
+  * Visits (Versioned Clinical Records):
+    - `POST /api/patients/:id/visits`: Add new visit (doctor only) [Create]
+    - `GET /api/patients/:id/visits`: Retrieve visit history [Read]
+    - `PUT /api/patients/:id/visits/:visitId`: Appends a NEW version with parent
+      hash without overwriting history!
+    - `POST /api/patients/:id/visits/:visitId/rollback`: Restore previous version [Rollback]
+  * Prescriptions & Digital Verification:
+    - `POST /api/prescriptions`: Issue prescription [Create]
+    - `GET /api/prescriptions/:id/pdf`: Stream printable PDF with digital QR code [Read]
+    - `GET /api/prescriptions/verify/:qrToken`: Public endpoint to verify authenticity [Read]
+  * Queue & Appointments:
+    - Full CRUD for booking, rescheduling, cancelling, and ticket calling.
+- Postman API Testing:
+  * File: `docs/clinictrack.postman_collection.json`. Pre-configured requests for
+    all auth, patient, visit, and queue workflows with environment variables.
+- Cloud Deployment Architecture:
+  * Documented in `docs/DEPLOYMENT.md`:
+    - Client: Deployed on Vercel as a compiled Single Page Application.
+    - Server: Deployed on Render as an Express web service.
+    - Database: Cloud-hosted MongoDB Atlas cluster (M0 free-tier).
+
+--- PART B: EXPECTED THEORETICAL VIVA QUESTIONS & MODEL ANSWERS ---
+
+Q1: What is a RESTful API? What are the key architectural constraints?
+A: REST (Representational State Transfer) is an architectural style for designing
+   networked applications based on HTTP standards.
+   6 Key Architectural Constraints:
+   1. Client-Server Architecture: Separation of UI concerns from data storage concerns.
+   2. Statelessness: Each request from client to server must contain all information
+      necessary to understand and complete the request. No session state on server.
+   3. Cacheability: Responses must define themselves as cacheable or non-cacheable.
+   4. Uniform Interface: Standard resource identification (URIs), resource manipulation
+      via representations (JSON), self-descriptive messages, and HATEOAS.
+   5. Layered System: Client cannot tell whether it is connected directly to the end
+      server or an intermediate proxy/load balancer.
+   6. Code on Demand (Optional): Server can temporarily extend client functionality (e.g. JS).
+
+Q2: Explain HTTP Methods and their Idempotency.
+A: - GET: Retrieve a resource. Safe and Idempotent (calling it 10 times produces same state).
+   - POST: Create a new resource. Neither Safe nor Idempotent (calling it 10 times
+     creates 10 new resources).
+   - PUT: Replace an existing resource completely or create if not present. Idempotent.
+   - PATCH: Partially update specific fields of a resource. Generally not idempotent.
+   - DELETE: Remove a resource. Idempotent (deleting once or multiple times leaves
+     resource gone).
+   * Safe: Does not modify server state. Idempotent: Multiple identical requests
+     result in the same system state as a single request.
+
+Q3: What are standard HTTP Status Codes? Give examples from your project.
+A: - 2xx Success:
+     * 200 OK: Standard successful request (e.g., `GET /api/patients`).
+     * 201 Created: New resource successfully created (e.g., `POST /api/patients`).
+   - 4xx Client Errors:
+     * 400 Bad Request: Malformed JSON or syntax.
+     * 401 Unauthorized: Missing or invalid JWT authentication token.
+     * 403 Forbidden: Authenticated user lacks required role permissions (e.g.,
+       reception staff trying to view clinical visits).
+     * 404 Not Found: Resource does not exist (`/api/patients/invalid-id`).
+     * 409 Conflict: Duplicate entry (e.g., registering an existing email).
+     * 422 Unprocessable Entity: Validation failed (express-validator failed fields).
+     * 429 Too Many Requests: Rate limit exceeded.
+   - 5xx Server Errors:
+     * 500 Internal Server Error: Uncaught server-side exception or database crash.
+
+Q4: How did you test your APIs using Postman?
+A: We created a Postman Collection (`docs/clinictrack.postman_collection.json`).
+   - Configured environment variables `{{baseUrl}}` and `{{token}}`.
+   - In the `/auth/login` request, added a Post-response Test script to extract
+     the returned JWT: `pm.environment.set("token", pm.response.json().data.token)`.
+   - All subsequent collection requests automatically pass `Authorization: Bearer {{token}}`.
+   - Verified response status codes (`pm.response.to.have.status(200)`), schema
+     validation, and pagination headers.
+
+--- PART C: EXAMINER PROJECT DEFENSE QUESTIONS ---
+- "Why use PUT vs PATCH for patient records?"
+  Answer: In our system, `PUT /api/patients/:id` is used when updating demographic
+  records with complete validated objects. However, for Visits, we do not mutate
+  the existing document; we append a new version with an incremented version number,
+  preserving clinical immutability.
+- "How do you deploy the frontend and backend separately?"
+  Answer: Frontend is a static bundle (`npm run build`) hosted on a CDN (Vercel)
+  pointing to the backend API via environment variable `VITE_API_URL`. Backend
+  runs as a long-running Node process on Render with CORS configured to allow the
+  Vercel domain.
+
+
+================================================================================
+TOPIC 7: NOSQL DATABASE (MONGODB) & SELF-STUDY TOPICS
+================================================================================
+
+--- PART A: HOW IT IS IMPLEMENTED IN OUR PROJECT ---
+- Location: `server/models/` and `server/seed/`
+- Database: MongoDB accessed through Mongoose 8 (Object Data Modeling - ODM).
+- Dual Mode Database Flexibility:
+  1. Production/Local: Connects to local MongoDB instance or MongoDB Atlas cluster
+     via connection string in `.env` (`MONGO_URI`).
+  2. Zero-Dependency In-Memory Mode: Uses `mongodb-memory-server`
+     (`npm run dev:memory`). Downloads a temporary binary in RAM, auto-seeds all
+     sample doctors, patients, visits, and queues. Perfect for offline viva demos
+     without requiring external database setup.
+- Schemas & Models:
+  * `User.js`: User accounts with bcryptjs hashed passwords (`select: false`),
+    roles (`doctor`, `staff`, `admin`).
+  * `Patient.js`: Patient demographics, allergies array, indexing on phone and fullName.
+  * `Visit.js`: Embedded versions array storing complete clinical consultation history
+    with doctor ID, diagnosis, symptoms, prescriptions, and cryptographic parent hash.
+  * `Appointment.js`, `Prescription.js`, `QueueTicket.js`, `AuditLog.js`.
+- Advanced MongoDB Features:
+  * Compound Indexing: `{ phone: 1, clinicId: 1 }` for lightning-fast lookups.
+  * Mongoose Aggregation Pipeline: Used in `server/controllers/analytics.controller.js`
+    to compute daily visit trends, peak clinic hours, and top diagnoses using
+    `$match`, `$group`, `$sort`, and `$project`.
+
+--- PART B: EXPECTED THEORETICAL VIVA QUESTIONS & MODEL ANSWERS ---
+
+Q1: What is a NoSQL Database? How does it differ from SQL (Relational) Databases?
+A: NoSQL (Not Only SQL) databases provide a mechanism for storage and retrieval of
+   data modeled in means other than tabular relations used in relational databases.
+   Comparison:
+   Feature          | SQL (e.g. MySQL, PostgreSQL) | NoSQL (e.g. MongoDB)
+   -----------------+------------------------------+----------------------------------
+   Data Model       | Tables with fixed Rows/Cols  | Documents (JSON/BSON), Key-Value,
+                    |                              | Columnar, or Graph
+   Schema           | Rigid, predefined schema     | Dynamic / Flexible schema
+   Scaling          | Vertical (scale-up CPU/RAM)  | Horizontal (scale-out sharding)
+   Transactions     | Strict ACID compliance       | BASE (Basically Available, Soft,
+                    |                              | Eventual consistency; multi-doc ACID)
+   Relationships    | Joins across foreign keys    | Embedded documents or references
+
+Q2: What is BSON? Why does MongoDB use it instead of pure JSON?
+A: BSON stands for Binary JSON. It is a binary-encoded serialization of JSON-like
+   documents.
+   Why MongoDB uses BSON:
+   1. More Data Types: Pure JSON only supports string, number, boolean, array,
+      object, null. BSON adds Date, BinData (binary), ObjectId, Int32, Int64, and Decimal128.
+   2. Fast Traversal: BSON stores element lengths and field indexes, allowing MongoDB
+      to skip unneeded fields during document scanning without parsing the entire text.
+
+Q3: What is Mongoose? What are Schemas and Models?
+A: Mongoose is an Object Data Modeling (ODM) library for MongoDB and Node.js.
+   - Schema: Defines the structure, data types, default values, validators, and
+     middleware hooks for documents within a collection.
+   - Model: A wrapper compiled from a Schema that provides the direct interface
+     for database CRUD operations (`find()`, `create()`, `updateOne()`, `aggregate()`).
+
+Q4: What is the Aggregation Pipeline in MongoDB?
+A: The aggregation pipeline is a framework for data processing modeled on the concept
+   of data processing pipelines. Documents enter a multi-stage pipeline where each
+   stage transforms the documents.
+   Common Stages:
+   - `$match`: Filters documents (like SQL WHERE).
+   - `$group`: Groups documents by a specified key and calculates accumulators
+     like `$sum`, `$avg` (like SQL GROUP BY).
+   - `$sort`: Orders documents (like SQL ORDER BY).
+   - `$project`: Reshapes documents, including/excluding fields.
+   - `$unwind`: Deconstructs an array field from input documents to output a document
+     for each element.
+
+Q5: What are Indexes in MongoDB and why are they crucial?
+A: Indexes are specialized data structures (typically B-Trees) that store a small
+   portion of the collection's data set in an easy-to-traverse form. Without indexes,
+   MongoDB must perform a Collection Scan (`COLLSCAN`), inspecting every document
+   in the collection sequentially. With an index on `{ phone: 1 }`, MongoDB performs
+   an Index Scan (`IXSCAN`), executing searches in logarithmic O(log N) time.
+
+--- PART C: SELF-STUDY COMPONENT COVERAGE ---
+
+Q6: [SELF-STUDY] What is Amazon DynamoDB? How does it differ from MongoDB?
+A: Amazon DynamoDB is a fully managed, serverless, proprietary NoSQL Key-Value and
+   Document database offered by Amazon Web Services (AWS).
+   Key Differences:
+   - Hosting: DynamoDB is 100% cloud-native serverless managed by AWS with auto-scaling;
+     MongoDB can be self-hosted, run on-premise, or managed via Atlas.
+   - Data Access: DynamoDB relies heavily on Partition Keys (PK) and Sort Keys (SK)
+     with Global/Local Secondary Indexes (GSI/LSI). Complex ad-hoc querying is restricted.
+     MongoDB supports rich ad-hoc queries and deep aggregation pipelines on any field.
+   - Billing: DynamoDB bills per Read/Write Capacity Units (RCU/WCU) or on-demand;
+     MongoDB is provisioned by compute tier/cluster specs.
+
+Q7: [SELF-STUDY] What is Apache Cassandra? When should it be chosen?
+A: Apache Cassandra is an open-source, highly distributed, wide-column NoSQL database
+   originally developed by Facebook.
+   Key Architecture:
+   - Masterless (Peer-to-Peer) Architecture: All nodes in a cluster play an identical
+     role based on Dynamo and Bigtable papers. There is no single point of failure (SPOF).
+   - High Write Throughput: Uses CommitLog and MemTable flushed to SSTables, making
+     writes exceptionally fast.
+   - Tunable Consistency: Implements the CAP theorem with AP (Availability and
+     Partition tolerance). Developers can tune read/write consistency levels (ONE, QUORUM, ALL).
+   - Ideal Use Case: Massive-scale time-series data, IoT sensor logs, and financial
+     telemetry across multi-datacenter global deployments.
+
+--- PART D: EXAMINER PROJECT DEFENSE QUESTIONS ---
+- "How does your project handle data persistence without overwriting patient visits?"
+  Answer: In [server/models/Visit.js], each visit document contains a `versions` array.
+  When an update occurs, the controller pushes a new version object into the array
+  containing updated clinical notes, the editor doctor ID, timestamp, and the SHA-256
+  hash of the previous version. Old data is preserved forever.
+- "How do you run the project if MongoDB is not installed on the viva machine?"
+  Answer: We implemented `npm run dev:memory` using `mongodb-memory-server`. It spins
+  up an ephemeral in-memory MongoDB daemon directly inside Node.js and pre-seeds it
+  with demonstration clinical records.
+
+
+================================================================================
+SECTION 3: CROSS-CUTTING ADVANCED TOPICS & ARCHITECTURE
+================================================================================
+
+1. AUTHENTICATION & AUTHORIZATION (JWT + BCRYPT):
+   - Authentication: Verifying *who* the user is (Login with Email & Password).
+     We use `bcryptjs` with salt rounds = 10 to hash passwords before storing.
+     Never store plaintext passwords!
+   - Authorization: Verifying *what* the user has permission to do (Role-Based Access Control).
+   - JWT (JSON Web Token) Structure: Three base64url-encoded parts separated by dots:
+     `Header.Payload.Signature`
+     * Header: Algorithm (`HS256`) and token type (`JWT`).
+     * Payload: Claims (e.g., `userId`, `role`, `exp` expiration).
+     * Signature: Computed using HMAC-SHA256(`Header + "." + Payload`, `JWT_SECRET`).
+   - Why JWT is Stateless: The server verifies the token signature cryptographically
+     without querying a session database or cache table.
+
+2. REAL-TIME WEBSOCKETS (SOCKET.IO):
+   - Problem with HTTP: HTTP is a request-response protocol; the server cannot push
+     data to the client without the client polling repeatedly.
+   - Solution: WebSocket provides a full-duplex, persistent TCP connection.
+   - ClinicTrack Implementation: When a doctor calls the next patient token in
+     `/queue`, the server emits a `queue:updated` event via Socket.IO. The full-screen
+     TV display at `/queue/board` updates instantly without refreshing.
+
+3. TAMPER-EVIDENT SHA-256 AUDIT LOG:
+   - Location: `server/models/AuditLog.js` and `server/services/audit.service.js`.
+   - Mechanism: Each critical clinical action creates an audit entry. The entry stores
+     the action, userId, targetId, timestamp, and a `hash` computed as:
+     `hash = SHA256(previousHash + action + targetId + timestamp)`.
+   - Result: Forms a cryptographic blockchain-like hash chain. If an intruder modifies
+     a past record in MongoDB, the hash chain breaks, and our UI verifier on the
+     `/audit` screen flags the exact compromised record.
+
+4. CLIENT-SIDE VS SERVER-SIDE VALIDATION:
+   - Client-side (Yup + React Hook Form): Enhances User Experience (UX). Provides
+     instant feedback as the user types, prevents unnecessary network calls.
+     CAN BE BYPASSED by disabling JS or using Postman/curl.
+   - Server-side (express-validator): Ensures Security and Data Integrity.
+     Validates data independently at the server boundary before database operations.
+     NEVER rely solely on client-side validation!
+
+
+================================================================================
+SECTION 4: TOP 25 RAPID-FIRE EXAMINER VIVA QUESTIONS & ANSWERS
+================================================================================
+
+1. Q: What is the default port of Apache Tomcat?
+   A: Port 8080 (configured in `conf/server.xml`).
+
+2. Q: What is the default port of MongoDB?
+   A: Port 27017.
+
+3. Q: Can HTML5 work without CSS or JavaScript?
+   A: Yes, HTML provides semantic content and structure. CSS and JS are layers
+      for presentation and interactivity.
+
+4. Q: What is the purpose of `<meta name="viewport">`?
+   A: It configures the browser's viewport dimensions and scaling for responsive
+      mobile rendering (`width=device-width, initial-scale=1.0`).
+
+5. Q: What is CORS?
+   A: Cross-Origin Resource Sharing. A browser security mechanism that restricts
+      HTTP requests between different origins unless explicitly allowed by the server.
+
+6. Q: What is the purpose of `useEffect` with an empty dependency array `[]`?
+   A: It runs the effect function exactly once after the component mounts (equivalent
+      to `componentDidMount`).
+
+7. Q: What is the difference between `null` and `undefined` in JavaScript?
+   A: `undefined` means a variable has been declared but not assigned a value.
+      `null` is an intentional assignment representing no value or an empty object.
+
+8. Q: Is Node.js multi-threaded?
+   A: Its JavaScript runtime execution is single-threaded, but internal background
+      tasks (file I/O, crypto) run multi-threaded via the `libuv` thread pool.
+
+9. Q: What does `npm` stand for?
+   A: Node Package Manager.
+
+10. Q: What is the difference between `dependencies` and `devDependencies`?
+    A: `dependencies` are required to run the application in production (e.g. Express,
+       Mongoose). `devDependencies` are only used for development/testing (e.g. ESLint,
+       Vite, Nodemon).
+
+11. Q: What is an Express route middleware?
+    A: A function with `(req, res, next)` signature placed inside a route definition
+       that executes before the final controller function.
+
+12. Q: What does HTTP Status Code 422 mean?
+    A: 422 Unprocessable Entity indicates that the server understands the content
+       type, but request fields failed semantic validation (used by express-validator).
+
+13. Q: What is the difference between PUT and PATCH?
+    A: PUT replaces the entire resource; PATCH applies partial modifications to
+       specific fields.
+
+14. Q: How does MongoDB generate the `_id` field?
+    A: It generates an `ObjectId`, a 12-byte BSON type consisting of a 4-byte timestamp,
+       5-byte random value, and 3-byte incrementing counter.
+
+15. Q: What is Mongoose `select: false`?
+    A: It excludes sensitive fields (like password hashes) from query results by
+       default unless explicitly requested with `.select('+password')`.
+
+16. Q: Why use bcrypt instead of plain MD5 or SHA256 for passwords?
+    A: MD5 and SHA-256 are fast general-purpose hash functions vulnerable to brute-force
+       and GPU dictionary attacks. Bcrypt is deliberately slow, salt-based, and
+       computationally expensive (work factor).
+
+17. Q: What is WebSockets?
+    A: A persistent, bi-directional, full-duplex communication protocol running
+       over a single TCP connection.
+
+18. Q: What is Vite and why is it faster than Webpack?
+    A: Vite leverages native browser ES Modules (ESM) during development without
+       bundling everything upfront, and uses `esbuild` written in Go for lightning-fast HMR.
+
+19. Q: What is a Higher-Order Component (HOC) or Protected Route?
+    A: A component pattern that wraps target routes and checks conditions (like auth tokens)
+       before rendering the children.
+
+20. Q: What is CAP theorem in distributed databases?
+    A: States that a distributed system can only guarantee two out of three:
+       Consistency, Availability, and Partition Tolerance.
+
+21. Q: What kind of database is Apache Cassandra?
+    A: A distributed Wide-Column / Column-Family NoSQL store with masterless architecture.
+
+22. Q: What kind of database is Amazon DynamoDB?
+    A: A fully managed, serverless NoSQL Key-Value and Document database by AWS.
+
+23. Q: What is Event Delegation in vanilla JavaScript?
+    A: Attaching a single event listener to a parent element to handle events on
+       current or future child elements via event bubbling.
+
+24. Q: What is the difference between LocalStorage and Cookies?
+    A: LocalStorage stores up to 5-10MB of key-value data in the browser with no
+       expiration and is not sent to the server. Cookies are limited to 4KB and are
+       automatically attached to every HTTP request header.
+
+25. Q: What is the single biggest security rule in full-stack web development?
+    A: "Never trust client input." Always validate and sanitize data on the server
+       boundary regardless of any frontend client validation.
+
+================================================================================
+END OF VIVA PREPARATION GUIDE
+================================================================================
